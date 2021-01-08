@@ -9,7 +9,7 @@ MegaDuino Firmware have a different way of displaying information on OLED 128x64
 Thanks to the sixth button included in the MegaDuino project (board & components are cased) there is the possibility of deleting files or doing a reset of the board (whithout opening the case).
 
 * Version 1.0 - January 8, 2021
-  - Started job of MegaDuino Firmware 
+  - Abandoned MaxDuino M versions & started job of MegaDuino Firmware
 
 
 # Links
