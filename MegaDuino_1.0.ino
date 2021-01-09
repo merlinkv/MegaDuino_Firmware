@@ -2,7 +2,7 @@
 //
 // Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and others.
 //
-// MegaDuino is an adaptation of the MaxDuino firmware by Rafael Molina but is specially designed for my MegaDuino & MegaDuino STM32 projects
+// MegaDuino Firmware is an adaptation of the MaxDuino firmware by Rafael Molina but is specially designed for my MegaDuino & MegaDuino STM32 projects
 //
 
 #define SDFat
@@ -50,7 +50,7 @@
 #else
   #include "STM32config.h"  
 #endif  
-#include "MaxDuino.h"
+#include "MegaDuino.h"
 
 #ifdef LCD16
   #include <Wire.h> 
@@ -119,7 +119,7 @@ int DirFilePos[3];                   //File Positios in Directory to be restored
 byte subdir = 0;
 unsigned long filesize;             // filesize used for dimensioning AY files
 
-#ifdef __AVR_ATmega2560__
+#if defined(__AVR_ATmega2560__)
   const byte chipSelect = 53;         // Sd card chip select pin
   #define btnUp         A0            // Up button
   #define btnDown       A1            // Down button
@@ -130,7 +130,7 @@ unsigned long filesize;             // filesize used for dimensioning AY files
   #define btnMotor      6             // Motor Sense (connect pin to gnd to play, NC for pause)
 #endif
 
-#ifdef __arm__ && __STM32F1__
+#if defined(__arm__) && defined(__STM32F1__)
   #define chipSelect    PB12          // Sd card chip select pin
   #define btnPlay       PA0           // Play Button
   #define btnStop       PA1           // Stop Button
@@ -231,7 +231,7 @@ void setup() {
   //General Pin settings
   //Setup buttons with internal pullup
 
-  #ifdef __AVR_ATmega2560__
+  #if defined(__AVR_ATmega2560__)
     PORTF |= _BV(0); // Analog pin A0
     PORTF |= _BV(1); // Analog pin A1
     PORTF |= _BV(2); // Analog pin A2
@@ -241,7 +241,7 @@ void setup() {
     PORTH |= _BV(3); // Digital pin 6
   #endif
 
-  #ifdef __arm__ && __STM32F1__
+  #if defined(__arm__) && defined(__STM32F1__)
     pinMode(btnPlay,INPUT_PULLUP);
     digitalWrite(btnPlay,HIGH);
     pinMode(btnStop,INPUT_PULLUP);
