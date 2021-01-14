@@ -121,7 +121,9 @@ byte skip2A = 1;                        // Pause on for BLK:2A
   //#define Cinta1                    // Cassette logo by MerlinKV
   //#define MegaDuino1                // MegaDuino logo by MerlinKV
   //#define MegaDuino2                  // MaxDuino MEGA logo by MerlinKV
-  #define MegaDuino3                  // MegaDuino logo by MerlinKV  
+  //#define MegaDuino3                  // MegaDuino logo by MerlinKV
+  #define MegaDuino4                  // MegaDuino logo by MerlinKV   
+  //#define MegaDuino5                  // MegaDuino logo by MerlinKV      
   //#define EmptyLogo               // to erase
   //#define Maxduino2Alf            // new Maxduino2 logo 128x64 by Alfredo Retrocant
   //#define CosmicCruiser             // Dragon32 CosmicCruiser by rcmolina

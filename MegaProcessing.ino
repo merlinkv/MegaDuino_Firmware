@@ -110,8 +110,12 @@ void TZXLoop() {
     } else {
          //lcdSpinner();
          if (pauseOn == 0) {
-          lcdTime();
-          lcdPercent();
+          #if defined(SHOW_CNTR)
+            lcdTime();          
+          #endif
+          #if defined(SHOW_PCT)          
+            lcdPercent();
+          #endif
          }
     } 
 }
@@ -428,7 +432,7 @@ void TZXProcess() {
                 #endif                
               #endif              
          
-              #ifdef OLED1306
+              #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                 #ifdef XY
                   setXY(3,3);
                   sendChar('1');sendChar('0');
@@ -514,7 +518,7 @@ void TZXProcess() {
                 #endif                
               #endif
               
-              #ifdef OLED1306
+              #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                 #ifdef XY
                   setXY(3,3);
                   sendChar('1');sendChar('1');
@@ -695,9 +699,9 @@ void TZXProcess() {
                     #endif                   
               #endif
         //#ifdef ID19REW                
-              #ifdef OLED1306
+              #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                     #ifdef XY
-                      setXY(7,2);
+                      setXY(3,3);
                       sendChar('1');sendChar('9');
                       setXY(14,2);
                       if ((block%10) == 0) sendChar(48+block/10);  
@@ -806,17 +810,71 @@ void TZXProcess() {
 
         case ID21:
           //Process ID21 - Group Start
+          #if defined(BLOCKID21_IN)
+              #if defined(BLOCKID_INTO_MEM)
+                blockOffset[block%maxblock] = bytesRead;
+                blockID[block%maxblock] = currentID;
+              #endif
+              #if defined(BLOCK_EEPROM_PUT)
+                #if defined(__AVR__)
+                  EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
+                  EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
+                #elif defined(__arm__) && defined(__STM32F1__)
+                  EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
+                  EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID); 
+                #endif                
+              #endif
+              #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
+                    #ifdef XY
+                      setXY(3,3);
+                      sendChar('2');sendChar('1');
+                      setXY(14,2);
+                  //    if (block == 0) sendChar('0');
+                  //    if (block == 10) sendChar('1');
+                      if ((block%10) == 0) sendChar(48+block/10);  
+                      setXY(15,2);
+                      sendChar(48+block%10);   
+                    #endif
+                    #if defined(XY2) && not defined(OLED1306_128_64)
+                      setXY(9,1);sendChar('2');sendChar('1');                      
+                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(13,1);sendChar(48+block%10);
+                    #endif
+                    #if defined(XY2) && defined(OLED1306_128_64)
+                      #ifdef XY2force
+                        sendStrXY("21",7,4);
+                        if ((block%10) == 0) {itoa(block/10,input,10);sendStrXY(input,14,4);}
+                        //itoa(block%10,input,10);sendStrXY(input,15,4);
+                        input[0]=48+block%10;input[1]=0;sendStrXY(input,15,4);                     
+                      #else
+                        setXY(7,4);sendChar('2');sendChar('1');                    
+                        setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
+                        setXY(15,4);sendChar(48+block%10);
+                      #endif
+                    #endif                    
+                #endif     
+                #if defined(BLOCKID_INTO_MEM)
+                  if (block < maxblock) block++;
+                  else block = 0; 
+                #endif
+                #if defined(BLOCK_EEPROM_PUT)
+                  if (block < 99) block++;
+                  else block = 0; 
+                #endif            
+          #endif
+                       
           if(r=ReadByte(bytesRead)==1) {
             bytesRead += outByte;
           }
           currentTask = GETID;
+          
         break;
 
         case ID22:
           //Process ID22 - Group End
           currentTask = GETID;
         break;
-
+        
         case ID24:
           //Process ID24 - Loop Start
           if(r=ReadWord(bytesRead)==2) {
@@ -923,7 +981,7 @@ void TZXProcess() {
                 #endif                 
               #endif
 
-              #ifdef OLED1306
+              #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                     #ifdef XY
                       setXY(3,3);
                       sendChar('4');sendChar('B');
@@ -1076,7 +1134,7 @@ void TZXProcess() {
                 #endif                 
               #endif
 
-              #ifdef OLED1306
+                #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                     #ifdef XY
                       setXY(3,3);
                       sendChar('F');sendChar('E');

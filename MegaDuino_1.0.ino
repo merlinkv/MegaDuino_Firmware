@@ -216,7 +216,7 @@ void setup() {
     Wire.begin();
     init_OLED();
     #if (!SPLASH_SCREEN)
-        delay(1000);              // Show logo
+        delay(2000);              // Show logo
         reset_display();           // Clear logo and load saved mode
         Banner();
     #endif
@@ -1848,7 +1848,7 @@ void Banner() {
     sendStr((unsigned char *)VERSION);
     setXY(0,4);
     sendStr((unsigned char *)"----------------");
-    delay(1000);
+    delay(1500);
     reset_display();
   #endif
   #ifdef LCD16

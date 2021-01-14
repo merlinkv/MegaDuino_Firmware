@@ -126,7 +126,7 @@ word currentPeriod=1;
 #define ID33                0x33    //Hardware type
 #define ID35                0x35    //Custom info block
 #define ID4B                0x4B    //Kansas City block (MSX/BBC/Acorn/...)
-#define IDPAUSE              0x59    //Custom Pause processing
+#define IDPAUSE             0x59    //Custom Pause processing
 #define ID5A                0x5A    //Glue block (90 dec, ASCII Letter 'Z')
 #define ORIC                0xFA    //Oric Tap File
 #define AYO                 0xFB    //AY file
