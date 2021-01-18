@@ -1,4 +1,4 @@
-# MegaDuino Firmware 1.1 Readme
+# MegaDuino Firmware 1.2 Readme
 
 Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and others.
 
@@ -8,6 +8,8 @@ MegaDuino Firmware have a different way of displaying information on OLED 128x64
 
 Thanks to the sixth button included in the MegaDuino project (board & components are cased) there is the possibility of deleting files or doing a reset of the board (whithout opening the case).
 
+* Version 1.2 - January 18, 2021
+  - Performed some code debugging tasks
 * Version 1.1 - January 14, 2021
   - Added logos & some bug fixes displaying ID Blocks
 * Version 1.0 - January 8, 2021
