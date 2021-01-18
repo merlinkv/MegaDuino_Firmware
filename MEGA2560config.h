@@ -62,10 +62,10 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 
 #define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
 #define OLED_ROTATE180
-#define OLED_address   0x3C           //0x3C or 0x3D
-#define OLED1306                      // Set if you are using OLED 1306 display
-#define OLED1306_128_64         // 128x64 resolution with 8 rows
-#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
+#define OLED_address   0x3C         // 0x3C or 0x3D
+#define OLED1306                    // Set if you are using OLED 1306 display
+#define OLED1306_128_64             // 128x64 resolution with 8 rows
+#define OLED1106_1_3                // Use this line as well if you have a 1.3" OLED screen
 
 // ==================================================================================
 
@@ -86,8 +86,8 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 #endif
 
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss
-#define MAXPAUSE_PERIOD   8300         // millis
-//#define MAXPAUSE_PERIOD   520         // millis  
+#define MAXPAUSE_PERIOD   8300      // millis
+//#define MAXPAUSE_PERIOD   520     // millis  
 #define OnPausePOLChg
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 #define maxblock 99                   // maxblock if not using EEPROM 
 #define BLOCK_EEPROM_START 512
 #define LOAD_EEPROM_SETTINGS
-#define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
+#define EEPROM_CONFIG_BYTEPOS  1023   // Byte position to save configuration
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // EEPROM LOGO. How to move to EEPROM, saving memory:
@@ -120,12 +120,11 @@ byte skip2A = 1;                        // Pause on for BLK:2A
   //#define CosmicCruiser             // Dragon32 CosmicCruiser by rcmolina
   //#define Cinta1                    // Cassette logo by MerlinKV
   //#define MegaDuino1                // MegaDuino logo by MerlinKV
-  //#define MegaDuino2                  // MaxDuino MEGA logo by MerlinKV
-  //#define MegaDuino3                  // MegaDuino logo by MerlinKV
-  #define MegaDuino4                  // MegaDuino logo by MerlinKV   
-  //#define MegaDuino5                  // MegaDuino logo by MerlinKV      
-  //#define EmptyLogo               // to erase
-  //#define Maxduino2Alf            // new Maxduino2 logo 128x64 by Alfredo Retrocant
+  //#define MegaDuino2                // MaxDuino MEGA logo by MerlinKV
+  #define MegaDuino3                  // MegaDuino logo by MerlinKV
+  //#define MegaDuino4                // MegaDuino logo by MerlinKV   
+  //#define MegaDuino5                // MegaDuino logo by MerlinKV      
+  //#define EmptyLogo                 // to erase
   //#define CosmicCruiser             // Dragon32 CosmicCruiser by rcmolina
   //#define Batman
   //#define Superman
@@ -189,8 +188,8 @@ byte skip2A = 1;                        // Pause on for BLK:2A
   //#define SUGARLESS_1              // new logo cretaed bt YoxxxoY
   //#define SUGARLESS_2              // new logo created by YoxxxoY
   //#define LOGOMINIDUINO            // new logo for A.Villena's Miniduino by rcmolina
-
 #endif
+
 /////////////////////
 //      FONTS      //
 /////////////////////

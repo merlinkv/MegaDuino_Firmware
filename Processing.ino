@@ -1480,20 +1480,6 @@ void TZXProcess() {
 
           #endif 
           
-          #ifdef P8544             
-            lcd.clear();
-            lcd.setCursor(0,0);
-            lcd.print("ID? ");
-            lcd.setCursor(4,0);
-            //lcd.print(String(currentID, HEX));
-            utoa(currentID,PlayBytes,16);
-            lcd.print(PlayBytes);
-            lcd.setCursor(0,1);
-            //lcd.print(String(bytesRead,HEX) + " - L: " + String(loopCount, DEC));
-            ltoa(bytesRead,PlayBytes,16);
-            lcd.print(PlayBytes) ;  lcd.print(" - L: "); lcd.print(loopCount);
-          #endif
-  
           //delay(8000);
            noInterrupts();  
            while(digitalRead(btnStop)==HIGH) {

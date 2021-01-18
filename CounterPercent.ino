@@ -13,10 +13,6 @@ void lcdSpinner() {
         #ifdef OLED1306
            setXY(15,1);sendChar(indicators[spinpos++]);                 
         #endif
-        #ifdef P8544
-          lcd.setCursor(8,3);
-          lcd.print(indicators[spinpos++]);
-        #endif                
         if (spinpos > 3) {   
           spinpos = 0;
         }
@@ -65,23 +61,6 @@ void lcdTime() {
              lcdsegs++; 
            #endif   
         #endif
-        #ifdef P8544
-        if (lcdsegs % 10 != 0) {itoa(lcdsegs%10,PlayBytes,10);
-        lcd.setCursor(13,3);
-        lcd.print(PlayBytes);} // ultima cifra 1,2,3,4,5,6,7,8,9
-            else 
-               if (lcdsegs % CNTRBASE != 0){itoa(lcdsegs%CNTRBASE,PlayBytes,10);
-               lcd.setCursor(12,3);
-               lcd.print(PlayBytes);} // es 10,20,30,40,50,60,70,80,90,110,120,..
-               else 
-                  if (lcdsegs % (CNTRBASE*10) != 0) {itoa(lcdsegs%(CNTRBASE*10)/CNTRBASE*100,PlayBytes,10);
-                  lcd.setCursor(11,3);
-                  lcd.print(PlayBytes);} // es 100,200,300,400,500,600,700,800,900,1100,..
-                  else {
-                    lcd.setCursor(11,3);
-                    lcd.print("000");} // es 000,1000,2000,...
-           lcdsegs++;
-        #endif
     }
 }
 
@@ -116,11 +95,6 @@ void lcdPercent() {
             sendChar('%');sendChar(' ');
           #endif
         #endif
-        #ifdef P8544
-          lcd.setCursor(0,3);
-          lcd.print(newpct);
-          lcd.print("%");               
-        #endif
     }
     if ((newpct >currpct)&& (newpct % 1 == 0)) {
          #ifdef LCD16            
@@ -146,11 +120,6 @@ void lcdPercent() {
               
             sendChar('%');
           #endif
-        #endif
-        #ifdef P8544
-          lcd.setCursor(0,3);
-          lcd.print(newpct);
-          lcd.print("%");  
         #endif
         currpct = newpct;
     } 

@@ -45,7 +45,7 @@ byte skip2A = 0;                        // Pause on for BLK:2A
 
 //#define LCD_I2C_ADDR    0x27        // Set the i2c address of your 1602LCD usually 0x27
 //#define LCD_I2C_ADDR    0x3f        // Set the i2c address of your 1602LCD usually 0x3f
-//#define LCDSCREEN16x2             // Set if you are using a 1602 LCD screen
+//#define LCDSCREEN16x2               // Set if you are using a 1602 LCD screen
 
 //#define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
 #define OLED_ROTATE180
@@ -74,7 +74,7 @@ byte lineaxy=2;
 #endif
 
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss (sorry, no space for separator)
-#define MAXPAUSE_PERIOD   8300         // millis
+#define MAXPAUSE_PERIOD   8300      // millis
 #define OnPausePOLChg               // 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +85,7 @@ byte lineaxy=2;
 #define maxblock 19                   // maxblock if not using EEPROM  
 #define BLOCK_EEPROM_START 512
 #define LOAD_EEPROM_SETTINGS
-#define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
+#define EEPROM_CONFIG_BYTEPOS  1023   // Byte position to save configuration
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // EEPROM LOGO. How to move to EEPROM, saving memory:
@@ -107,12 +107,11 @@ byte lineaxy=2;
   //#define CosmicCruiser             // Dragon32 CosmicCruiser by rcmolina
   //#define Cinta1                    // Cassette logo by MerlinKV
   //#define MegaDuino1                // MegaDuino logo by MerlinKV
-  //#define MegaDuino2                  // MaxDuino MEGA logo by MerlinKV
-  //#define MegaDuino3                  // MegaDuino logo by MerlinKV
+  //#define MegaDuino2                // MaxDuino MEGA logo by MerlinKV
+  //#define MegaDuino3                // MegaDuino logo by MerlinKV
   #define MegaDuino4                  // MegaDuino logo by MerlinKV   
-  //#define MegaDuino5                  // MegaDuino logo by MerlinKV      
-  //#define EmptyLogo               // to erase
-  //#define Maxduino2Alf            // new Maxduino2 logo 128x64 by Alfredo Retrocant
+  //#define MegaDuino5                // MegaDuino logo by MerlinKV      
+  //#define EmptyLogo                 // to erase
   //#define CosmicCruiser             // Dragon32 CosmicCruiser by rcmolina
   //#define Batman
   //#define Superman

@@ -505,35 +505,3 @@ static void init_OLED(void) {
 }
 
 #endif
-
-//==========================================================//
-
-#ifdef P8544
-
-void bitmap2(uint8_t bdata[], uint8_t rows, uint8_t columns)
-{
-  uint8_t row, column;
-  uint16_t  i; // de tipo word para poder leer mas de 256 bytes
-  uint8_t toprow = 0;
-  uint8_t startcolumn = 0;
-  for (row = 0, i = 0; row < rows; row++) {
-    lcd.gotoRc(row+toprow, startcolumn);
-    for (column = 0; column < columns; column++) {
-      lcd.data(pgm_read_byte(&bdata[i++]));
-    }
-  }
-}
-
- static void P8544_splash (void)
-{
-  lcd.gotoRc(0, 0);
-  /* lcd.bitmap(logo1, 3,84);
-  lcd.gotoRc(3, 0);
-  lcd.bitmap(logo2, 3,84); */
-  bitmap2(logo, 6,84);
-  
-  delay(2000); 
-  lcd.clear();
-  
-}
-#endif
