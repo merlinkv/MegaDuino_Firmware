@@ -701,7 +701,7 @@ void TZXProcess() {
         //#ifdef ID19REW                
               #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                     #ifdef XY
-                      setXY(3,3);
+                      setXY(7,2);
                       sendChar('1');sendChar('9');
                       setXY(14,2);
                       if ((block%10) == 0) sendChar(48+block/10);  

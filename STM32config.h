@@ -73,19 +73,26 @@ byte lineaxy=1;
 byte lineaxy=2;
 #endif
 
-#define CNTRBASE 100                // 100 for sss, 60 for m:ss (sorry, no space for separator)
+#define SHOW_CNTR
+#define SHOW_PCT
+#define CNTRBASE 100                // 100 for sss, 60 for m:ss
 #define MAXPAUSE_PERIOD   8300      // millis
-#define OnPausePOLChg               // 
+//#define MAXPAUSE_PERIOD   520     // millis  
+#define ONPAUSE_POLCHG 
+#define BLOCKMODE                   // REW or FF a block when in pause and Play to select it 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
 #define TIMEOUT_RESET   60 // Timeout for reset tzxduino (without pause or play activated), comment to not reset.
 //#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
 #define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
-#define maxblock 19                   // maxblock if not using EEPROM  
+#define maxblock 99                   // maxblock if not using EEPROM
+#define BLOCKID21_IN
+#define BLOCKTAP_IN
+#define OLEDPRINTBLOCK 
 #define BLOCK_EEPROM_START 512
 #define LOAD_EEPROM_SETTINGS
-#define EEPROM_CONFIG_BYTEPOS  1023   // Byte position to save configuration
+#define EEPROM_CONFIG_BYTEPOS  1023     // Byte position to save configuration
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // EEPROM LOGO. How to move to EEPROM, saving memory:
