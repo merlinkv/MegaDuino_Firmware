@@ -113,12 +113,13 @@ unsigned long filesize;             // filesize used for dimensioning AY files
 
 #if defined(__arm__) && defined(__STM32F1__)
   #define chipSelect    PB12          // Sd card chip select pin
-  #define btnPlay       PA0           // Play Button
-  #define btnStop       PA1           // Stop Button
-  #define btnUp         PA2           // Up button
-  #define btnDown       PA3           // Down button
-  #define btnMotor      PA8           // Motor Sense (connect pin to gnd to play, NC for pause)
-  #define btnRoot       PA4           // Return to SD card root
+  #define btnUp         PA3            // Up button
+  #define btnDown       PA2            // Down button
+  #define btnPlay       PA1            // Play Button
+  #define btnStop       PA0            // Stop Button
+  #define btnRoot       PB9            // Return to SD card root
+  #define btnDelete     PA4            // Two options: Delete files or reset the board
+  #define btnMotor      PA8            // Motor Sense (connect pin to gnd to play, NC for pause)
 #endif
 
 #define scrollSpeed   250           //text scroll delay
