@@ -72,7 +72,7 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 #define SHOW_DIRPOS
 //#define video64text32
 //#define btnRoot_AS_PIVOT
-//#define SHOW_DIRNAMES
+#define SHOW_DIRNAMES
 #define SHOW_BLOCKPOS_LCD
   
 #define XY                         // use original settings for Oled line 0,1 and status for menu

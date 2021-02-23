@@ -445,7 +445,7 @@ if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1
   TSXCONTROLzxpolarityUEFSWITCHPARITY = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
   #ifdef OLED1306
     printtextF(PSTR("                "),1); 
-      OledStatusLine();
+    OledStatusLine();
   #endif
   #ifdef LCD16
     printtextF(PSTR("                "),1);
@@ -692,10 +692,11 @@ if(digitalRead(btnStop)==LOW && start==1
     debounce(btnStop);   
   }     
 
-if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1             //  up block sequential search
-  #ifdef btnRoot_AS_PIVOT
-    && digitalRead(btnRoot)
-  #endif
+#ifdef BLOCKMODE
+  if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1             //  up block sequential search
+    #ifdef btnRoot_AS_PIVOT
+      && digitalRead(btnRoot)
+    #endif
   ){
 
 /*
@@ -735,7 +736,8 @@ if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1             //  up block se
        }
  */      
     }
-#ifdef btnRoot_AS_PIVOT
+#endif    
+#if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
      if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {         // up block half-interval search
         if (block >oldMinBlock) {
           oldMaxBlock = block;
@@ -774,28 +776,29 @@ if(digitalRead(btnUp)==LOW && start==0   // up dir sequential search
      }
 #endif
 
-if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 // down block sequential search
-  #ifdef btnRoot_AS_PIVOT
-    && digitalRead(btnRoot)
-  #endif
-  ){      // down block sequential search  
-    #ifdef BLOCKID_INTO_MEM
-      oldMinBlock = 0;
-      oldMaxBlock = maxblock;
-      if (block < maxblock) block++;
-      else block = 0;       
+#ifdef BLOCKMODE
+  if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 // down block sequential search
+    #ifdef btnRoot_AS_PIVOT
+      && digitalRead(btnRoot)
     #endif
-    #ifdef BLOCK_EEPROM_PUT
-      oldMinBlock = 0;
-      oldMaxBlock = 99;
-      if (block < 99) block++;
-      else block = 0;
-    #endif
-    GetAndPlayBlock();    
-    debounce(btnDown);                  
-  }
-
-#ifdef btnRoot_AS_PIVOT
+    ){      // down block sequential search  
+      #ifdef BLOCKID_INTO_MEM
+        oldMinBlock = 0;
+        oldMaxBlock = maxblock;
+        if (block < maxblock) block++;
+        else block = 0;       
+      #endif
+      #ifdef BLOCK_EEPROM_PUT
+        oldMinBlock = 0;
+        oldMaxBlock = 99;
+        if (block < 99) block++;
+        else block = 0;
+      #endif
+      GetAndPlayBlock();    
+      debounce(btnDown);                  
+    }
+#endif
+#if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
      if(digitalRead(btnDown)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {     // down block half-interval search
         if (block <oldMaxBlock) {
           oldMinBlock = block;
