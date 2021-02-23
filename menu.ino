@@ -91,13 +91,12 @@
       }
     
     if(digitalRead(btnDown)==LOW && !lastbtn){
-      //#ifndef Use_UEF
-      if(menuItem<3) menuItem+=1;
-      //#endif
-      //#ifdef Use_UEF
-      //if(menuItem<2) menuItem+=1;      
-      //#endif
-      
+      #ifdef MenuBLK2A
+        if(menuItem<3) menuItem+=1;
+      #endif
+      #ifndef MenuBLK2A
+        if(menuItem<2) menuItem+=1;      
+      #endif
       lastbtn=true;
       updateScreen=true;
     }
@@ -370,11 +369,11 @@
     checkLastButton();
   }
   updateEEPROM();
-  debounce(btnStop);
   #ifdef OLED1306
     setXY(0,2);
     sendStr((unsigned char *)"                ");
   #endif
+  debounce(btnStop);
  }
 
  void updateEEPROM()
@@ -408,11 +407,9 @@
 
   if(mselectMask) settings |=128;
   if(TSXCONTROLzxpolarityUEFSWITCHPARITY) settings |=64;
-//  #ifndef Use_UEF
-  if(skip2A) settings |=32;
-//  #endif
-  EEPROM.put(EEPROM_CONFIG_BYTEPOS,settings);
-  setBaud();
+  #ifdef MenuBLK2A
+    if(skip2A) settings |=32;
+  #endif
 
   #if defined(__AVR__)
     EEPROM.put(EEPROM_CONFIG_BYTEPOS,settings);
@@ -444,11 +441,11 @@
     TSXCONTROLzxpolarityUEFSWITCHPARITY=0;
   }
   #ifdef MenuBLK2A
-  if(bitRead(settings,5)) {
-    skip2A=1;
-  } else {
-    skip2A=0;
-  }   
+    if(bitRead(settings,5)) {
+      skip2A=1;
+    } else {
+      skip2A=0;
+    }   
   #endif
   if(bitRead(settings,0)) {
     BAUDRATE=1200;
@@ -462,8 +459,8 @@
   if(bitRead(settings,3)) {
     BAUDRATE=3850;  
   }
-  setBaud();
-  //UniSetup();
+//  setBaud();
+  UniSetup();
  
  }
 

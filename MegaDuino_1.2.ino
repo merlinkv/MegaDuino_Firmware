@@ -1153,9 +1153,6 @@ void seekFile(int pos) {
     #ifdef LCD20
       lcd.setCursor(0,1); lcd.print("                    ");
     #endif
-    #ifdef P8544
-      printtext("                 ",3);
-    #endif
   } else {
     ltoa(filesize,PlayBytes,10); printtext(strcat_P(PlayBytes,PSTR(" bytes")),1);
   }
