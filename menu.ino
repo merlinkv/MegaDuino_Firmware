@@ -371,8 +371,10 @@
   }
   updateEEPROM();
   debounce(btnStop);
-  setXY(0,2);
-  sendStr((unsigned char *)"                ");  
+  #ifdef OLED1306
+    setXY(0,2);
+    sendStr((unsigned char *)"                ");
+  #endif
  }
 
  void updateEEPROM()

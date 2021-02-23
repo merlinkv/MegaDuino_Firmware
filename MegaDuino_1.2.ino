@@ -350,12 +350,15 @@ void loop(void) {
                 setXY(0,2);
                 sendStr((unsigned char *)"----------------");
             }
-          #else      
-            if (pauseOn == 0) printtextF(PSTR("Paused"),1); 
-            firstBlockPause = true;
-            else printtextF(PSTR("Playing"),1);
-          #endif                         
-          firstBlockPause = false; 
+          #else            
+            if (pauseOn == 0) {
+              printtextF(PSTR("Paused"),1); 
+              firstBlockPause = true;
+            } else {
+              printtextF(PSTR("Playing"),1);
+              firstBlockPause = false; 
+            }
+          #endif
           #ifdef LCD16            
             if (currpct <100) {              
               itoa(newpct,PlayBytes,10);strcat_P(PlayBytes,PSTR("%"));lcd.setCursor(9,1);lcd.print(PlayBytes);
