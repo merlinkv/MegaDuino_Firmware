@@ -4,14 +4,14 @@
 //
 // MegaDuino Firmware is an adaptation of the MaxDuino firmware by Rafael Molina but is specially designed for my MegaDuino & MegaDuino STM32 projects
 //
+// Version 1.2 - February 23, 2021
+//    Fixed some bugs on LCD screens
 // Version 1.2 - January 18, 2021
 //    Performed some code debugging tasks
 // Version 1.1 - January 14, 2021
 //    Added logos & some bug fixes displaying ID Blocks
 // Version 1.0 - January 8, 2021
 //    Abandoned MaxDuino M versions & started job of MegaDuino Firmware
-
-
 
 #define SDFat
 
@@ -112,7 +112,7 @@ unsigned long filesize;             // filesize used for dimensioning AY files
 #endif
 
 #if defined(__arm__) && defined(__STM32F1__)
-  #define chipSelect    PB12          // Sd card chip select pin
+  #define chipSelect    PB12           // Sd card chip select pin
   #define btnUp         PA3            // Up button
   #define btnDown       PA2            // Down button
   #define btnPlay       PA1            // Play Button
@@ -434,27 +434,26 @@ void loop(void) {
        debounce(btnPlay);         
      }
 
-#ifdef OnPausePOLChg
-
-if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1
-  #ifdef btnRoot_AS_PIVOT
-    && digitalRead(btnStop)==LOW   
-  #endif
-  ){
-       // change tsx speed control/zx polarity/uefTurboMode
-  TSXCONTROLzxpolarityUEFSWITCHPARITY = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
-  #ifdef OLED1306
-    printtextF(PSTR("                "),1); 
-    OledStatusLine();
-  #endif
-  #ifdef LCD16
-    printtextF(PSTR("                "),1);
-  #endif       
-  #ifdef LCD20
-    printtextF(PSTR("                    "),1);
-    LCDBStatusLine();
-  #endif
-  debounce(btnRoot);  
+#ifdef ONPAUSE_POLCHG
+  if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1
+    #ifdef btnRoot_AS_PIVOT
+      && digitalRead(btnStop)==LOW   
+    #endif
+    ){
+    // change tsx speed control/zx polarity/uefTurboMode
+    TSXCONTROLzxpolarityUEFSWITCHPARITY = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
+    #ifdef OLED1306
+      printtextF(PSTR("                "),1); 
+      OledStatusLine();
+    #endif
+    #ifdef LCD16
+      printtextF(PSTR("                "),1);
+    #endif       
+    #ifdef LCD20
+      printtextF(PSTR("                    "),1);
+      LCDBStatusLine();
+    #endif
+    debounce(btnRoot);  
   }
 #endif
 
@@ -523,7 +522,7 @@ if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1
           lcd.print((char *)input);lcd.print('<');lcd.print(' ');
           lcd.print(oldMaxFileName);                  
         #endif
-                                        
+
         #if defined(OLED1306) && !defined(SHOW_DIRNAMES)
           char len=0;
           setXY(0,0);
@@ -592,16 +591,11 @@ if(digitalRead(btnRoot)==LOW && start==0
   #endif
   #if defined(Use_MENU) && !defined(RECORD_EEPROM_LOGO)
     menuMode();
-    #ifdef LCD16
+    #ifdef LCD16 || LCD20
       lcd.setCursor(0,0);
       printtext(PlayBytes,1);          
       printtextF(PSTR(""),1);
     #endif
-    #ifdef LCD20
-      lcd.setCursor(0,0);
-      printtext(PlayBytes,1);
-      printtextF(PSTR(""),0);
-    #endif       
     #ifdef OLED1306
       printtext(PlayBytes,0);
       printtextF(PSTR(""),lineaxy);
@@ -641,15 +635,11 @@ if(digitalRead(btnStop)==LOW && start==1
   ){      
   stopFile();
   debounce(btnStop);
+  ltoa(filesize,PlayBytes,10);printtext(strcat_P(PlayBytes,PSTR(" bytes")),1);  
   #ifdef OLED1306
-    ltoa(filesize,PlayBytes,10);printtext(strcat_P(PlayBytes,PSTR(" bytes")),1);
     OledStatusLine();
   #endif
-  #ifdef LCD16
-    ltoa(filesize,PlayBytes,10);printtext(strcat_P(PlayBytes,PSTR(" bytes")),1);
-  #endif       
   #ifdef LCD20
-    ltoa(filesize,PlayBytes,10);printtext(strcat_P(PlayBytes,PSTR(" bytes")),1);
     LCDBStatusLine();
   #endif       
   }
@@ -694,15 +684,6 @@ if(digitalRead(btnStop)==LOW && start==1
       && digitalRead(btnRoot)
     #endif
   ){
-
-/*
-       bytesRead=11;                     // for tzx skip header(10) + GETID(11)
-       currentTask=PROCESSID;
-*/
-/*
-       bytesRead=0;                       // for both tap and tzx, no header for tap
-       currentTask=GETFILEHEADER;         //First task (default): search for tzx header
-*/
     firstBlockPause = false;
     #ifdef BLOCKID_INTO_MEM
       oldMinBlock = 0;
@@ -716,32 +697,20 @@ if(digitalRead(btnStop)==LOW && start==1
       if (block > 0) block--;
       else block = 99;
     #endif
-        
-/*    
-       EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
-       EEPROM.get(BLOCK_EEPROM_START+4+5*block, currentID);
-       currentTask=PROCESSID; 
-       
-       SetPlayBlock();
-*/
-       GetAndPlayBlock();       
-       debounce(btnUp);         
-/*       while(digitalRead(btnUp)==LOW) {
-         //prevent button repeats by waiting until the button is released.
-         delay(50); 
-       }
- */      
-    }
+    GetAndPlayBlock();       
+    debounce(btnUp);         
+  }
 #endif    
+
 #if defined(BLOCKMODE) && defined(btnRoot_AS_PIVOT)
-     if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {         // up block half-interval search
-        if (block >oldMinBlock) {
-          oldMaxBlock = block;
-          block = oldMinBlock + (oldMaxBlock - oldMinBlock)/2;
-        }
-       GetAndPlayBlock();    
-       debounce(btnUp);         
-     }
+  if(digitalRead(btnUp)==LOW && start==1 && pauseOn==1 && digitalRead(btnRoot)==LOW) {         // up block half-interval search
+    if (block >oldMinBlock) {
+      oldMaxBlock = block;
+      block = oldMinBlock + (oldMaxBlock - oldMinBlock)/2;
+    }
+    GetAndPlayBlock();    
+    debounce(btnUp);         
+  }
 #endif
 
 if(digitalRead(btnUp)==LOW && start==0   // up dir sequential search
@@ -843,13 +812,13 @@ if(digitalRead(btnDown)==LOW && start==0
            lcd.setCursor(0,1); lcd.print("-----PRESS PLAY-----");    
          #endif  
          #ifdef OLED1306
-              #ifdef XY
-                setXY(0,0); printtext(fileName,0);
-                setXY(0,2); sendStr((unsigned char *)"---PRESS PLAY---");
-              #endif
-              #ifdef XY2
-                sendStrXY("PAUSED ",0,0);
-              #endif
+           #ifdef XY
+             setXY(0,0); printtext(fileName,0);
+             setXY(0,2); sendStr((unsigned char *)"---PRESS PLAY---");
+           #endif
+           #ifdef XY2
+             sendStrXY("PAUSED ",0,0);
+           #endif
          #endif 
          scrollPos=0;
          //scrollText(fileName);
@@ -1389,7 +1358,7 @@ void scrollText(char* text, int rowtxt){
 }
 
 void printtext2F(const char* text, int l) {  //Print text to screen. 
-  #ifdef LCD16
+  #ifdef LCD16 || LCD20
     lcd.setCursor(0,l);
     char x = 0;
     while (char ch=pgm_read_byte(text+x)) {
@@ -1397,14 +1366,6 @@ void printtext2F(const char* text, int l) {  //Print text to screen.
       x++;
     }
   #endif
-  #ifdef LCD20
-    lcd.setCursor(0,l);
-    char x = 0;
-    while (char ch=pgm_read_byte(text+x)) {
-      lcd.print(ch);
-      x++;
-    }
-  #endif  
   #ifdef OLED1306
     #ifdef XY2
       strncpy_P(fline, text, 16);
