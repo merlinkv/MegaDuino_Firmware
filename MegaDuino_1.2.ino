@@ -257,26 +257,26 @@ void setup() {
   #endif  
   #ifdef LCD20
     lcd.clear();
-    printtextF(PSTR("    SD Card - OK    "),0);
+    printtextF(PSTR("--------------------"),0);    
+    printtextF(PSTR("    SD Card - OK    "),1);
+    printtextF(PSTR("--------------------"),2);    
   #endif
   delay(2000);
+  loadEEPROM();
   #ifdef OLED1306
     reset_display();
   #endif
-  #ifdef LCD16
+  #ifdef LCD16 || LCD20
     lcd.clear();
-    loadEEPROM();    
   #endif
   #ifdef LCD20
-    loadEEPROM();
     LCDBStatusLine();
   #endif
-  getMaxFile();                     //get the total number of files in the directory
-  seekFile(currentFile);            //move to the first file in the directory
-  loadEEPROM();
   #ifdef OLED1306
     OledStatusLine();
-  #endif
+  #endif  
+  getMaxFile();                     //get the total number of files in the directory
+  seekFile(currentFile);            //move to the first file in the directory
 }
 
 void loop(void) {
@@ -594,24 +594,20 @@ if(digitalRead(btnRoot)==LOW && start==0
     menuMode();
     #ifdef LCD16
       lcd.setCursor(0,0);
-      scrollPos=0;
-      scrollText(fileName,0);            
       printtext(PlayBytes,1);          
       printtextF(PSTR(""),1);
     #endif
     #ifdef LCD20
       lcd.setCursor(0,0);
-      scrollPos=0;
-      scrollText(fileName,0);            
       printtext(PlayBytes,1);
       printtextF(PSTR(""),0);
     #endif       
     #ifdef OLED1306
       printtext(PlayBytes,0);
       printtextF(PSTR(""),lineaxy);
-      scrollPos=0;
-      scrollText(fileName,0);            
     #endif
+    scrollPos=0;
+    scrollText(fileName,0);     
   #else
     #ifdef RECORD_EEPROM_LOGO
       init_OLED();
