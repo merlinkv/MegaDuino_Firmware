@@ -2,6 +2,7 @@
 void checkForEXT (char *filename) {
     //Check for .xxx file extension as these have no header
   char x =0;
+
   while (*(filename+x) && (*(filename+x) != '.')) x++;
   if(strstr_P(strlwr(filename + x), PSTR(".tap"))) {
     casduino =0; currentTask=PROCESSID; currentID=TAP;
@@ -21,7 +22,7 @@ void checkForEXT (char *filename) {
  #ifdef Use_UEF
   else if(strstr_P(strlwr(filename + x), PSTR(".uef"))) {casduino =0; currentTask=GETUEFHEADER; currentID=UEF;}
  #endif
-// #ifdef Use_CAS
+ //#ifdef Use_CAS
   else if(strstr_P(strlwr(filename + x), PSTR(".cas"))) {
     casduino =1; 
     out=LOW;

@@ -1,4 +1,8 @@
-#define Use_MENU                // removing menu saves space
+////////////////                        CONFIG FOR NEW ARDUINO MEGA2560                        ////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*                 Add // at the beginning of lines to comment and remove selected option                                */
+//**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
+#define Use_MENU                          // removing menu saves space
 #define AYPLAY
 #define MenuBLK2A
 #define DIRECT_RECORDING

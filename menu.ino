@@ -370,8 +370,7 @@
   }
   updateEEPROM();
   #ifdef OLED1306
-    setXY(0,2);
-    sendStr((unsigned char *)"                ");
+    setXY(0,2); sendStr((unsigned char *)"----------------");    
   #endif
 //  #ifdef LCD20
 //    LCDBStatusLine();  
