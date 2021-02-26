@@ -4,12 +4,14 @@ word TickToUs(word ticks) {
 }
 
 void UniPlay(char *filename){
-  Timer1.stop();                              //Stop timer interrupt
+  setBaud();
   #ifdef SDFat
     if(!entry.open(filename,O_READ)) {
+    //  printtextF(PSTR("Error Opening File"),0);
     }
   #else
     if(!SD.open(filename,O_READ)) {
+    //  printtextF(PSTR("Error Opening File"),0);
     }
   #endif
   block=0;                                    // Initial block when starting
@@ -26,9 +28,16 @@ void UniPlay(char *filename){
     passforZero=2;
     passforOne=4;
     WRITE_LOW;    
-    Timer1.initialize(1000);                //100ms pause prevents anything bad happening before we're ready
-    Timer1.attachInterrupt(wave2);
+    #if defined(__AVR__)    
+      Timer1.initialize(1000);                //100ms pause prevents anything bad happening before we're ready
+      Timer1.attachInterrupt(wave2);
+    #elif defined(__arm__) && defined(__STM32F1__)
+      timer.setPeriod(1000);
+      timer.attachInterrupt(2,wave2); // channel 2
+      timer.resume();      
+    #endif
   }
+
 #ifdef Use_CAS
   else {
     #if defined(__AVR__)
@@ -1398,7 +1407,13 @@ void TZXProcess() {
           } else {
               if (forcePause0) { // Stop the Tape
                 if(!count==0) {
+
+                #if defined(__AVR__)
                   currentPeriod = 32769;
+                #elif defined(__arm__) && defined(__STM32F1__)
+                  currentPeriod = 50;
+                #endif
+
                   count += -1;
                 } else {
                   pauseOn=1;
@@ -1407,7 +1422,8 @@ void TZXProcess() {
                     printtext2F(PSTR("--   PAUSED   --"),1);
                   #else
                     printtext2F(PSTR("PAUSED*"),0);
-                  #endif                  
+                  #endif 
+                  count = 255;
                   forcePause0=0;
                 }
               } else { 
@@ -1420,7 +1436,13 @@ void TZXProcess() {
         case IDEOF:
           //Handle end of file
           if(!count==0) {
+          
+          #if defined(__AVR__)
             currentPeriod = 32769;
+          #elif defined(__arm__) && defined(__STM32F1__)
+            currentPeriod = 50;
+          #endif
+                 
             count += -1;
           } else {
             stopFile();
@@ -1428,7 +1450,7 @@ void TZXProcess() {
           }       
 
         break; 
-
+        
         default:
           //stopFile();
           //ID Not Recognised - Fall back if non TZX file or unrecognised ID occurs
@@ -2164,10 +2186,45 @@ void wave2() {
   byte pauseFlipBit = false;
   unsigned long newTime=1;
   intError = false;
+/*  
+      if (bitRead(workingPeriod, 14)== 0) {
+        pinState = !pinState;
+        if (pinState == LOW)     WRITE_LOW;    
+        else  WRITE_HIGH;
+      } else {
+        if (bitRead(workingPeriod, 13) == 0)     WRITE_LOW;    
+        else  {WRITE_HIGH; bitClear(workingPeriod,13);}     
+        bitClear(workingPeriod,14);         //Clear ID15 flag
+        workingPeriod = SampleLength;            
+      } 
+        newTime = workingPeriod;
+        pos += 2;
+        if(pos > buffsize)                  //Swap buffer pages if we've reached the end
+        {
+          pos = 0;
+          workingBuffer^=1;
+          morebuff = HIGH;                  //Request more data to fill inactive page
+        }
+        timer.setPeriod(newTime+4);
+*/ 
+/*
+        pinState = !pinState;
+        if (pinState == LOW)     WRITE_LOW;    
+        else  WRITE_HIGH;
+        newTime = workingPeriod;
+        pos += 2;
+        if(pos > buffsize)                  //Swap buffer pages if we've reached the end
+        {
+          pos = 0;
+          workingBuffer^=1;
+          morebuff = HIGH;                  //Request more data to fill inactive page
+        }
+        timer.setPeriod(newTime+4);
+*/        
  
   if(isStopped==0 && workingPeriod >= 1)
   {
-      if bitRead(workingPeriod, 15)
+      if bitRead(workingPeriod, 15)          
       {
         //If bit 15 of the current period is set we're about to run a pause
         //Pauses start with a 1.5ms where the output is untouched after which the output is set LOW
@@ -2178,13 +2235,13 @@ void wave2() {
         pauseFlipBit = true;
         wasPauseBlock = true;
       } else {
-        /*
-        if(workingPeriod >= 1 && wasPauseBlock==false) {
+        
+       // if(workingPeriod >= 1 && wasPauseBlock==false) {
           //pinState = !pinState;
-        } else if (wasPauseBlock==true && isPauseBlock==false) {
-          wasPauseBlock=false;
-        }
-        */
+       // } else if (wasPauseBlock==true && isPauseBlock==false) {
+       //   wasPauseBlock=false;
+       // }
+        
             if (wasPauseBlock==true && isPauseBlock==false) wasPauseBlock=false;        
       }
       #ifdef DIRECT_RECORDING
@@ -2206,12 +2263,12 @@ void wave2() {
       if(pauseFlipBit==true) {
         newTime = 1500;                     //Set 1.5ms initial pause block
         
-      /*  #ifdef rpolarity
-          pinState = LOW;                     //Set next pinstate LOW
-        #endif
-        #ifndef rpolarity
-          pinState = HIGH;                     //Set next pinstate HIGH
-        #endif */
+      //  #ifdef rpolarity
+      //    pinState = LOW;                     //Set next pinstate LOW
+      //  #endif
+      //  #ifndef rpolarity
+      //    pinState = HIGH;                     //Set next pinstate HIGH
+      //  #endif
 
  //       if (TSXCONTROLzxpolarityUEFSWITCHPARITY) pinState = LOW;         //Set next pinstate LOW
  //       else pinState = HIGH;                     //Set next pinstate HIGH
@@ -2252,18 +2309,92 @@ void wave2() {
       morebuff = HIGH;
     }
   } else {
-    newTime = 1000000;                         //Just in case we have a 0 in the buffer    
+    newTime = 50000;                         //Just in case we have a 0 in the buffer    
     //newTime = 100000;                         //Just in case we have a 0 in the buffer
   }
   //newTime += 12;
   //fudgeTime = micros() - fudgeTime;         //Compensate for stupidly long ISR
   //Timer1.setPeriod(newTime - fudgeTime);    //Finally set the next pulse length
+  
   #if defined(__AVR__)
     Timer1.setPeriod(newTime +4);    //Finally set the next pulse length
-  #elif defined(__arm__) && defined(__STM32f1__)
-    timer.setPeriod(newTime + 4);
-  #endif  
+  #elif defined(__arm__) && defined(__STM32F1__)    
+    //timer.setPeriod(newTime -4);
+    newTime += 2;
+
+    if (newTime < 65536/36) {
+      timer.setPrescaleFactor(72/36);
+      timer.setOverflow(newTime*36);
+    }else
+    if (newTime < 65536/18) {
+      timer.setPrescaleFactor(72/18);
+      timer.setOverflow(newTime*18);
+    }else
+    if (newTime < 65536/16) {
+      timer.setPrescaleFactor(72/16);
+      timer.setOverflow(newTime*16);
+    }else
+    if (newTime < 65536/8) {
+      timer.setPrescaleFactor(72/8);
+      timer.setOverflow(newTime*8);
+    }else
+/*    if (newTime < 65536/4) {
+      timer.setPrescaleFactor(72/4);
+      timer.setOverflow(newTime*4);
+    }else
+    if (newTime < 65536/2) {
+      timer.setPrescaleFactor(72/2);
+      timer.setOverflow(newTime*2);
+    }else */
+    if (newTime < 65536) {
+      timer.setPrescaleFactor(72);
+      timer.setOverflow(newTime);
+    }else
+    if (newTime < 65536*2) {
+      timer.setPrescaleFactor(72*2);
+      timer.setOverflow(newTime/2);
+    }else
+    if (newTime < 65536*4) {
+      timer.setPrescaleFactor(72*4);
+      timer.setOverflow(newTime/4);
+    }else
+    if (newTime < 65536*8) {
+      timer.setPrescaleFactor(72*8);
+      timer.setOverflow(newTime/8);
+    }else
+/*    if (newTime < 65536*16) {
+      timer.setPrescaleFactor(72*16);
+      timer.setOverflow(newTime/16);
+    }else
+    if (newTime < 65536*32) {
+      timer.setPrescaleFactor(72*32);
+      timer.setOverflow(newTime/32);
+    }else */
+    if (newTime < 65536*64) {
+      timer.setPrescaleFactor(72*64);
+      timer.setOverflow(newTime/64);
+    }else
+/*    if (newTime < 65536*128) {
+      timer.setPrescaleFactor(72*128);
+      timer.setOverflow(newTime/128);
+    }else
+    if (newTime < 65536*256) {
+      timer.setPrescaleFactor(72*256);
+      timer.setOverflow(newTime/256);
+    }else */
+    if (newTime < 65536*512) {                                    
+      timer.setPrescaleFactor(72*512);
+      timer.setOverflow(newTime/512);
+    }else {                           
+      timer.setPrescaleFactor(72*512);
+      timer.setOverflow(65535);      
+    }
+      timer.refresh();
+  #endif
+
 }
+
+
 
 void writeHeader2() {
   //Convert byte from HDR Vector String into string of pulses and calculate checksum. One pulse per pass
@@ -2374,13 +2505,13 @@ void setBaud()
 
 void uniLoop() {
 
-/*
- if (casduino) {                 //Check for CAS File.  As these have no header we can skip straight to playing data
-    casduinoLoop();
- }  else {
-    TZXLoop();
- }  
-*/
+
+// if (casduino) {                 //Check for CAS File.  As these have no header we can skip straight to playing data
+//    casduinoLoop();
+// }  else {
+//    TZXLoop();
+// }  
+
  if (!casduino) {                 
     TZXLoop();
  }  

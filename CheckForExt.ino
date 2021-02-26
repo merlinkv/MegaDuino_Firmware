@@ -21,7 +21,7 @@ void checkForEXT (char *filename) {
  #ifdef Use_UEF
   else if(strstr_P(strlwr(filename + x), PSTR(".uef"))) {casduino =0; currentTask=GETUEFHEADER; currentID=UEF;}
  #endif
- //#ifdef Use_CAS
+// #ifdef Use_CAS
   else if(strstr_P(strlwr(filename + x), PSTR(".cas"))) {
     casduino =1; 
     out=LOW;

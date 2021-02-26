@@ -1512,48 +1512,55 @@ void OledStatusLine() {
   }
 #endif
 
-void SetPlayBlock() {
+void SetPlayBlock(){
   printtextF(PSTR(" "),0);
-  #ifdef LCD16
+  #ifdef LCD16 || LCD20
     lcd.setCursor(0,0);
-    lcd.print("BLK:");
+    lcd.print(F("BLK:"));
     lcd.print(block);lcd.print(' ');
     if (bytesRead > 0){
-      lcd.print("ID:");lcd.print(currentID,HEX); // Block ID en hex
+      lcd.print(F("ID:"));lcd.print(currentID,HEX); // Block ID en hex
     }
-  #endif
-  #ifdef LCD20
-    lcd.setCursor(0,0);
-    lcd.print("BLK:");
-    lcd.print(block);lcd.print(' ');
-    if (bytesRead > 0){
-      lcd.print("ID:");lcd.print(currentID,HEX); // Block ID en hex
-    }
-  #endif
-  #ifdef OLED1306
-    setXY(6,3);
-    sendStr((unsigned char *)"BLK:");
-    if (block < 10 ) {
-      setXY(10,3);sendStr("0");
-      setXY(11,3);
-      utoa(block, (char *)input, 10);sendStr(input);sendChar(' ');  
-    } else {
-      setXY(10,3);
-      utoa(block, (char *)input, 10);sendStr(input);sendChar(' ');
-    }
-    if (bytesRead > 0){
-      setXY(0,3);
-      sendStr((unsigned char *)"ID:");
-      utoa(currentID,(char *)input,16);sendStr((unsigned char *)strupr((char *)input)); // Block ID en hex
-    }
-  #endif
-  lcdsegs=0;       
-  currentBit=0;                               // fallo reproducción de .tap tras .tzx
-  pass=0;
-  checkForEXT (sfileName);
+    #endif
+    #ifdef OLED1306
+      #ifdef XY2
+        sendStrXY("BLK:",0,0);
+        input[0]=48+block/10;input[1]=48+block%10;input[2]=0;sendStrXY((char *)input,4,0);
+        //utoa(block, (char *)input, 10);sendStrXY(input,4,0);//sendChar(' ');
+        if (bytesRead > 0){
+          sendStrXY(" ID:", 6,0);
+          if (currentID/16 < 10) input[0]=48+currentID/16;
+          else input[0]=55+currentID/16;
+          if (currentID%16 < 10) input[1]=48+currentID%16;
+          else input[1]=55+currentID%16;
+          input[2]=0;sendStrXY((char *)input,10,0);
+        }          
+      #else
+          setXY(6,3);
+          sendStr((unsigned char *)"BLK:");
+          if (block < 10 ) {
+            setXY(10,3);sendStr("0");
+            setXY(11,3);
+            utoa(block, (char *)input, 10);sendStr(input);sendChar(' ');  
+          } else {
+            setXY(10,3);
+            utoa(block, (char *)input, 10);sendStr(input);sendChar(' ');
+          }
+          if (bytesRead > 0){
+             setXY(0,3);
+             sendStr((unsigned char *)"ID:");
+             utoa(currentID,(char *)input,16);sendStr((unsigned char *)strupr((char *)input)); // Block ID en hex
+          }
+      #endif
+    #endif      
+       currpct=100; 
+       lcdsegs=0;       
+       currentBit=0;                               // fallo reproducción de .tap tras .tzx
+       pass=0;
+       checkForEXT (sfileName);
   if (!casduino) {
-    currentBlockTask = READPARAM;               //First block task is to read in parameters
-    Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
+  currentBlockTask = READPARAM;               //First block task is to read in parameters
+  Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
   }
 }
 

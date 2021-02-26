@@ -1,21 +1,19 @@
-#if defined(__AVR_ATmega2560__)
+#ifdef __AVR_ATmega2560__
   #define outputPin           23 
-#endif
-#if defined(__arm__) && defined(__STM32F1__)
-  #define outputPin     PA9    // this pin is 5V tolerant and PWM output capable  
-#endif
-
-#if defined(__AVR_ATmega2560__)
-  #define INIT_OUTPORT         DDRA |=  _BV(1)         // El pin23 es el bit1 del PORTA
+  #define INIT_OUTPORT        DDRA |=  _BV(1)         // El pin23 es el bit1 del PORTA
   #define WRITE_LOW           PORTA &= ~_BV(1)         // El pin23 es el bit1 del PORTA
   #define WRITE_HIGH          PORTA |=  _BV(1)         // El pin23 es el bit1 del PORTA
-#endif
-
-#if defined(__arm__) && defined(__STM32F1__)
-  #define INIT_OUTPORT          pinMode(outputPin,OUTPUT)  
-  #define WRITE_LOW             digitalWrite(outputPin,LOW)
-  #define WRITE_HIGH            digitalWrite(outputPin,HIGH)
-#endif      
+#elif defined(__arm__) && defined(__STM32F1__)
+  #define outputPin           PA9    // this pin is 5V tolerant and PWM output capable
+  #define INIT_OUTPORT            pinMode(outputPin,OUTPUT)
+  //#define INIT_OUTPORT            pinMode(outputPin,OUTPUT); GPIOA->regs->CRH |=  0x00000030  
+  #define WRITE_LOW               digitalWrite(outputPin,LOW)
+  //#define WRITE_LOW               GPIOA->regs->ODR &= ~0b0000001000000000
+  //#define WRITE_LOW               gpio_write_bit(GPIOA, 9, LOW)
+  #define WRITE_HIGH              digitalWrite(outputPin,HIGH)
+  //#define WRITE_HIGH              GPIOA->regs->ODR |=  0b0000001000000000
+  //#define WRITE_HIGH              gpio_write_bit(GPIOA, 9, HIGH)
+#endif 
 
 #define SHORT_SILENCE       122
 #define LONG_SILENCE        SHORT_SILENCE*2

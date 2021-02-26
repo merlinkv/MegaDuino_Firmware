@@ -48,7 +48,7 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 // Uncomment next options to select LCD screens. Remember to comment the OLED options
 // ==================================================================================
 
-//#define LCD_I2C_ADDR    0x27  // Set the i2c address of your 1602LCD or 2004A usually 0x27 but can be 3f, just test.
+#define LCD_I2C_ADDR    0x27  // Set the i2c address of your 1602LCD or 2004A usually 0x27 but can be 3f, just test.
 //#define LCD16               // Set if you are using a 1602 LCD screen
 //#define LCD20                 // Set if you are using a 2004A LCD screen
 //#define SHOW_STATUS_LCD
