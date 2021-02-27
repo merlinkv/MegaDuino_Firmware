@@ -10,7 +10,7 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 * Version 1.3 - February 27, 2021
   - Fixed some bugs with MSX CAS files
-  - Time optimized
+  - Timer optimized
 * Version 1.2 - February 23, 2021
   - Fixed some bugs on LCD screens
 * Version 1.2 - January 18, 2021
