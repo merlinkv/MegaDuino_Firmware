@@ -1,4 +1,4 @@
-# MegaDuino Firmware 1.2 Readme
+# MegaDuino Firmware 1.3 Readme
 
 Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and others.
 
@@ -8,8 +8,8 @@ Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and other
 
 Thanks to the sixth button included in the MegaDuino project (board & components are cased) there is the possibility of deleting files or doing a reset of the board (whithout opening the case).
 
-* Version 1.2 - February 26, 2021
-  - Fixed some bugs with MSX CAS files
+* Version 1.3 - February 27, 2021
+  - Fixed some bugs with MSX CAS files & optimized Timer
 * Version 1.2 - February 23, 2021
   - Fixed some bugs on LCD screens
 * Version 1.2 - January 18, 2021
