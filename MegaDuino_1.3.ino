@@ -338,12 +338,10 @@ void loop(void) {
           //If a file is playing, pause or unpause the file                  
           #ifdef LCD16
             String filename2 = fileName;
-            lcd.setCursor(0,0); lcd.print("                ");
             lcd.setCursor(0,0); lcd.print(filename2.substring(0,16));
           #endif
           #ifdef LCD20
             String filename2 = fileName;
-            lcd.setCursor(0,0); lcd.print("                    ");
             lcd.setCursor(0,0); lcd.print(filename2.substring(0,20));
           #endif          
           #ifdef OLED1306
