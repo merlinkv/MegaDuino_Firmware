@@ -639,13 +639,17 @@ if(digitalRead(btnStop)==LOW && start==1
   ){      
   stopFile();
   debounce(btnStop);
-  ltoa(filesize,PlayBytes,10);printtext(strcat_P(PlayBytes,PSTR(" bytes")),1);  
+  #ifdef LCD16
+    lcd.setCursor(0,1); lcd.print("                ");  
+  #endif  
+  #ifdef LCD20
+    lcd.setCursor(0,1); lcd.print("                    ");  
+    LCDBStatusLine();
+  #endif
   #ifdef OLED1306
     OledStatusLine();
-  #endif
-  #ifdef LCD20
-    LCDBStatusLine();
-  #endif       
+  #endif     
+  ltoa(filesize,PlayBytes,10);printtext(strcat_P(PlayBytes,PSTR(" bytes")),1);  
   }
   if(digitalRead(btnStop)==LOW && start==0 && subdir >0) {                                         // back subdir
     #if (SPLASH_SCREEN && TIMEOUT_RESET)
