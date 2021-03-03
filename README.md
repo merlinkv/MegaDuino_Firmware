@@ -8,6 +8,8 @@ Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and other
 
 Thanks to the sixth button included in the MegaDuino project (board & components are cased) there is the possibility of deleting files or doing a reset of the board (whithout opening the case).
 
+* Version 1.3 - March 3, 2021
+  - Again .... Fixed some bugs on LCD screens
 * Version 1.3 - February 27, 2021
   - Fixed some bugs with MSX CAS files
   - Timer optimized
