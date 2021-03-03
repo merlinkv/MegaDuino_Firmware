@@ -833,15 +833,29 @@ if(digitalRead(btnDown)==LOW && start==0
          #ifdef LCD16
             String filename2 = fileName;
             lcd.setCursor(0,0); lcd.print("                ");
-            lcd.setCursor(0,0); lcd.print(filename2.substring(0,16));         
-            lcd.setCursor(0,1); lcd.print("Playing");    
+            lcd.setCursor(0,0); lcd.print(filename2.substring(0,16));
+            lcd.setCursor(0,1); lcd.print("                ");                     
+            lcd.setCursor(0,1); lcd.print("Playing");
+            lcd.setCursor(9,1); lcd.print(newpct); lcd.print("%");
+            lcd.setCursor(14,1); lcd.print("000");
+            if (lcdsegs % CNTRBASE != 0){itoa(lcdsegs%CNTRBASE,PlayBytes,10);lcd.setCursor(15,1);lcd.print(PlayBytes);} // // recálculo de decenas ... 10,20,30,40,50,60,70,80,90,110,120,..
+              else 
+                if (lcdsegs % (CNTRBASE*10) != 0) {itoa(lcdsegs%(CNTRBASE*10)/CNTRBASE*100,PlayBytes,10);lcd.setCursor(14,1);lcd.print(PlayBytes);} // recálculo de centenas ... 100,200,300,400,500,600,700,800,900,1100, ...
+           lcdsegs++;                
          #endif 
          #ifdef LCD20
             String filename2 = fileName;
             lcd.setCursor(0,0); lcd.print("                    ");
             lcd.setCursor(0,0); lcd.print(filename2.substring(0,20));
+            lcd.setCursor(0,1); lcd.print("                    ");            
             lcd.setCursor(0,1); lcd.print("Playing");
-         #endif 
+            lcd.setCursor(11,1); lcd.print(newpct); lcd.print("%");
+            lcd.setCursor(17,1); lcd.print("000");
+            if (lcdsegs % CNTRBASE != 0){itoa(lcdsegs%CNTRBASE,PlayBytes,10);lcd.setCursor(18,1);lcd.print(PlayBytes);} // recálculo de decenas ... 10,20,30,40,50,60,70,80,90,110,120,..
+              else 
+                if (lcdsegs % (CNTRBASE*10) != 0) {itoa(lcdsegs%(CNTRBASE*10)/CNTRBASE*100,PlayBytes,10);lcd.setCursor(17,1);lcd.print(PlayBytes);} // recálculo de centenas ... 100,200,300,400,500,600,700,800,900,1100, ...
+           lcdsegs++;
+         #endif
          #ifdef OLED1306
             #ifdef XY
               setXY(0,0);
@@ -1470,10 +1484,9 @@ void printtext(char* text, int l) {  //Print text to screen.
 #ifdef OLED1306
 void OledStatusLine() {
     #ifdef XY
-      setXY(0,2);
-      sendStr((unsigned char*)"                ");
-      setXY(0,3);
-      sendStr((unsigned char*)"ID:   BLK:  ");
+      setXY(0,2); sendStr((unsigned char *)"----------------");    
+      // setXY(0,2); sendStr((unsigned char*)"                ");
+      setXY(0,3); sendStr((unsigned char*)"ID:   BLK:  ");
       #ifdef OLED1306_128_64
         setXY(0,4);sendStr("Baud ---> ");
         setXY(0,5);sendStr("Motor --> ");

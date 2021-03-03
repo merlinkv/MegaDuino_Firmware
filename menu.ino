@@ -29,26 +29,20 @@
   {
     if(updateScreen) {
       #ifdef OLED1306
-        setXY(0,0);
-        sendStr((unsigned char *)"Menu            ");
-        setXY(0,2);
-        sendStr((unsigned char *)"----------------");
+        setXY(0,0); sendStr((unsigned char *)"Menu            ");
+        setXY(0,2); sendStr((unsigned char *)"----------------");
         switch(menuItem) {
         case 0:
-          setXY(0,1);
-          sendStr((unsigned char *)"Baud Rate?      ");
+          setXY(0,1); sendStr((unsigned char *)"Baud Rate?      ");
         break;
         case 1:
-          setXY(0,1);
-          sendStr((unsigned char *)"Motor Ctrl?     ");
+          setXY(0,1); sendStr((unsigned char *)"Motor Ctrl?     ");
         break;        
         case 2:
-          setXY(0,1);
-          sendStr((unsigned char *)"TSXCzxpUEF?     ");
+          setXY(0,1); sendStr((unsigned char *)"TSXCzxpUEF?     ");
         break;
         case 3:
-          setXY(0,1);
-          sendStr((unsigned char *)"SkipBLK 2A?     ");
+          setXY(0,1); sendStr((unsigned char *)"SkipBLK 2A?     ");
         break;        
         }
       #endif
