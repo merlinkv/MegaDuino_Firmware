@@ -1,4 +1,4 @@
-# MegaDuino Firmware 1.3 Readme
+# MegaDuino Firmware Readme
 
 Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and others.
 
