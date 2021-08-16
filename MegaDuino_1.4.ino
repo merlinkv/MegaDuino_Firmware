@@ -1,10 +1,12 @@
-#define VERSION "MegaDuino 1.3"
+#define VERSION "MegaDuino 1.4"
 //
 // Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and others.
 //
 // MegaDuino Firmware is an adaptation of the MaxDuino firmware by Rafael Molina but is specially designed for my MegaDuino & MegaDuino STM32 projects
 //
 //
+// Version 1.4 - August 18, 2021
+//    Fixed some bugs on ID19 & ID21 Block Types
 // Version 1.3 - February 27, 2021
 //    Fixed some bugs with MSX CAS files
 //    Timer optimized
