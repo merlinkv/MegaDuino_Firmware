@@ -710,11 +710,11 @@ void TZXProcess() {
         //#ifdef ID19REW                
               #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                     #ifdef XY
-                      setXY(7,2);
+                      setXY(3,3);
                       sendChar('1');sendChar('9');
-                      setXY(14,2);
+                      setXY(10,3);
                       if ((block%10) == 0) sendChar(48+block/10);  
-                      setXY(15,2);
+                      setXY(11,3);
                       sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
@@ -837,11 +837,11 @@ void TZXProcess() {
                     #ifdef XY
                       setXY(3,3);
                       sendChar('2');sendChar('1');
-                      setXY(14,2);
+                      setXY(10,3);
                   //    if (block == 0) sendChar('0');
                   //    if (block == 10) sendChar('1');
                       if ((block%10) == 0) sendChar(48+block/10);  
-                      setXY(15,2);
+                      setXY(11,3);
                       sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
