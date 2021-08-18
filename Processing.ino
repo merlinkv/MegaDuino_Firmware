@@ -763,45 +763,19 @@ void TZXProcess() {
                 bytesToRead += -88 ;    // pauseLength + SYMDEFs
               #endif
               //currentChar=0;
-              currentBlockTask=DATA;
+              currentBlockTask=PAUSE;
             break;
-        /*    
-            case PILOT:
-              //ZX81FilenameBlock();
-              bytesRead += 3 ;  // skip until DataStream .P file offset
-              currentBlockTask = DATA;             
-            break;
-        */ 
-             case PAUSE:
+            case PAUSE:
               currentPeriod = PAUSELENGTH;
               bitSet(currentPeriod, 15);
               currentBlockTask=DATA;
             break; 
-            
             case DATA:
-              //if (block <= 10) {
-                //bytesRead += bytesToRead;
-                //bytesToRead = 0;
-                //currentTask = GETID;
-              //} else {
               ZX8081DataBlock();
-              //}
             break;
           }  
         break;
 
-      /*  //Old ID20
-        case ID20:
-          //process ID20 - Pause Block
-          if(r=ReadWord(bytesRead)==2) {
-            if(outWord>0) {
-              currentPeriod = pauseLength;
-              bitSet(currentPeriod, 15);
-            }
-            currentTask=GETID;
-          }
-        break; */     
-        
         case ID20:
           //process ID20 - Pause Block
           if(r=ReadWord(bytesRead)==2) {
@@ -838,8 +812,6 @@ void TZXProcess() {
                       setXY(3,3);
                       sendChar('2');sendChar('1');
                       setXY(10,3);
-                  //    if (block == 0) sendChar('0');
-                  //    if (block == 10) sendChar('1');
                       if ((block%10) == 0) sendChar(48+block/10);  
                       setXY(11,3);
                       sendChar(48+block%10);   
@@ -853,7 +825,6 @@ void TZXProcess() {
                       #ifdef XY2force
                         sendStrXY("21",7,4);
                         if ((block%10) == 0) {itoa(block/10,input,10);sendStrXY(input,14,4);}
-                        //itoa(block%10,input,10);sendStrXY(input,15,4);
                         input[0]=48+block%10;input[1]=0;sendStrXY(input,15,4);                     
                       #else
                         setXY(7,4);sendChar('2');sendChar('1');                    
@@ -871,12 +842,10 @@ void TZXProcess() {
                   else block = 0; 
                 #endif            
           #endif
-                       
           if(r=ReadByte(bytesRead)==1) {
             bytesRead += outByte;
           }
           currentTask = GETID;
-          
         break;
 
         case ID22:
@@ -921,13 +890,6 @@ void TZXProcess() {
         case ID30:
           //Process ID30 - Text Description
           if(r=ReadByte(bytesRead)==1) {
-            //Show info on screen - removed until bigger screen used
-            //byte j = outByte;
-            //for(byte i=0; i<j; i++) {
-            //  if(ReadByte(bytesRead)==1) {
-            //    lcd.print(char(outByte));
-            //  }
-            //}
             bytesRead += outByte;
           }
           currentTask = GETID;
@@ -995,8 +957,6 @@ void TZXProcess() {
                       setXY(3,3);
                       sendChar('4');sendChar('B');
                       setXY(10,3);
-                  //    if (block == 0) sendChar('0');
-                  //    if (block == 10) sendChar('1');
                       if ((block%10) == 0) sendChar(48+block/10);  
                       setXY(11,3);
                       sendChar(48+block%10);   
@@ -1059,24 +1019,12 @@ void TZXProcess() {
                       zeroPulse = TickToUs(729);      
                       break;
                     case 3600:
-                    //  pilotLength = onePulse = TickToUs(319); //2800
-                    //  zeroPulse = TickToUs(628);
-                      /* pilotLength = onePulse = TickToUs(252); //3500
-                      zeroPulse = TickToUs(504); */
                       pilotLength = onePulse = TickToUs(243); //3600
                       zeroPulse = TickToUs(486);                    
                       break;
                     case 3850:
-                      /* pilotLength = onePulse = TickToUs(238); //3675
-                      zeroPulse = TickToUs(476);   */    
-                      /* pilotLength = onePulse = TickToUs(236); //3700
-                      zeroPulse = TickToUs(472);   */                    
-                //      pilotLength = onePulse = TickToUs(233); //3760
-                //      zeroPulse = TickToUs(466);
                       pilotLength = onePulse = 65; //3850=1000000/(65*4)
                       zeroPulse = 130;                  
-                      //pilotLength = onePulse = TickToUs(225); //3900
-                      //zeroPulse = TickToUs(450);                                                                                           
                       break;
                   }
                
@@ -1377,7 +1325,11 @@ void TZXProcess() {
                 //currentPeriod = 100; // 100ms pause
                 //bitSet(currentPeriod, 15);
                 if(!count==0) {
-                  currentPeriod = 32769;
+                  #if defined(__AVR__)
+                    currentPeriod = 32769;
+                  #elif defined(__arm__) && defined(__STM32F1__)
+                    currentPeriod = 50;
+                  #endif
                   count += -1;
                 } else {
                   count= 100;
@@ -1438,7 +1390,7 @@ void TZXProcess() {
           if(!count==0) {
           
           #if defined(__AVR__)
-            currentPeriod = 32769;
+            currentPeriod = 10;
           #elif defined(__arm__) && defined(__STM32F1__)
             currentPeriod = 50;
           #endif
@@ -2029,7 +1981,8 @@ void OricDataBlock() {
     } else if(r==0) {                         // If we reached the EOF
       EndOfFile=true;
       temppause = 0;
-      forcePause0=1;
+      //forcePause0=1;
+      forcePause0=0;
       count =255;
       currentID = IDPAUSE;
       //currentBlockTask = GAP;
@@ -2186,42 +2139,6 @@ void wave2() {
   byte pauseFlipBit = false;
   unsigned long newTime=1;
   intError = false;
-/*  
-      if (bitRead(workingPeriod, 14)== 0) {
-        pinState = !pinState;
-        if (pinState == LOW)     WRITE_LOW;    
-        else  WRITE_HIGH;
-      } else {
-        if (bitRead(workingPeriod, 13) == 0)     WRITE_LOW;    
-        else  {WRITE_HIGH; bitClear(workingPeriod,13);}     
-        bitClear(workingPeriod,14);         //Clear ID15 flag
-        workingPeriod = SampleLength;            
-      } 
-        newTime = workingPeriod;
-        pos += 2;
-        if(pos > buffsize)                  //Swap buffer pages if we've reached the end
-        {
-          pos = 0;
-          workingBuffer^=1;
-          morebuff = HIGH;                  //Request more data to fill inactive page
-        }
-        timer.setPeriod(newTime+4);
-*/ 
-/*
-        pinState = !pinState;
-        if (pinState == LOW)     WRITE_LOW;    
-        else  WRITE_HIGH;
-        newTime = workingPeriod;
-        pos += 2;
-        if(pos > buffsize)                  //Swap buffer pages if we've reached the end
-        {
-          pos = 0;
-          workingBuffer^=1;
-          morebuff = HIGH;                  //Request more data to fill inactive page
-        }
-        timer.setPeriod(newTime+4);
-*/        
- 
   if(isStopped==0 && workingPeriod >= 1)
   {
       if bitRead(workingPeriod, 15)          
@@ -2235,14 +2152,7 @@ void wave2() {
         pauseFlipBit = true;
         wasPauseBlock = true;
       } else {
-        
-       // if(workingPeriod >= 1 && wasPauseBlock==false) {
-          //pinState = !pinState;
-       // } else if (wasPauseBlock==true && isPauseBlock==false) {
-       //   wasPauseBlock=false;
-       // }
-        
-            if (wasPauseBlock==true && isPauseBlock==false) wasPauseBlock=false;        
+        if (wasPauseBlock==true && isPauseBlock==false) wasPauseBlock=false;        
       }
       #ifdef DIRECT_RECORDING
       if (bitRead(workingPeriod, 14)== 0) {
@@ -2262,22 +2172,7 @@ void wave2() {
       #endif
       if(pauseFlipBit==true) {
         newTime = 1500;                     //Set 1.5ms initial pause block
-        
-      //  #ifdef rpolarity
-      //    pinState = LOW;                     //Set next pinstate LOW
-      //  #endif
-      //  #ifndef rpolarity
-      //    pinState = HIGH;                     //Set next pinstate HIGH
-      //  #endif
-
- //       if (TSXCONTROLzxpolarityUEFSWITCHPARITY) pinState = LOW;         //Set next pinstate LOW
- //       else pinState = HIGH;                     //Set next pinstate HIGH
-
         pinState = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
-       
-        //wbuffer[pos][workingBuffer] = highByte(workingPeriod - 1);
-        //wbuffer[pos+1][workingBuffer] = lowByte(workingPeriod - 1);
-        //wbuffer[pos][workingBuffer] = workingPeriod - 1;  //reduce pause by 1ms as we've already pause for 1.5ms
         wbuffer[pos][workingBuffer] = (workingPeriod - 1) /256;  //reduce pause by 1ms as we've already pause for 1.5ms
         wbuffer[pos+1][workingBuffer] = (workingPeriod - 1) %256;  //reduce pause by 1ms as we've already pause for 1.5ms                 
         pauseFlipBit=false;
@@ -2298,7 +2193,6 @@ void wave2() {
           morebuff = HIGH;                  //Request more data to fill inactive page
         } 
      }
-  //} else if(workingPeriod <= 1 && isStopped==0) {
   } else if (isStopped==0) {  
     newTime = 1000;                         //Just in case we have a 0 in the buffer
     //pos += 1;
@@ -2312,89 +2206,15 @@ void wave2() {
     newTime = 50000;                         //Just in case we have a 0 in the buffer    
     //newTime = 100000;                         //Just in case we have a 0 in the buffer
   }
-  //newTime += 12;
-  //fudgeTime = micros() - fudgeTime;         //Compensate for stupidly long ISR
-  //Timer1.setPeriod(newTime - fudgeTime);    //Finally set the next pulse length
-  
   #if defined(__AVR__)
     Timer1.setPeriod(newTime +4);    //Finally set the next pulse length
   #elif defined(__arm__) && defined(__STM32F1__)    
     //timer.setPeriod(newTime -4);
     newTime += 2;
-
-    if (newTime < 65536/36) {
-      timer.setPrescaleFactor(72/36);
-      timer.setOverflow(newTime*36);
-    }else
-    if (newTime < 65536/18) {
-      timer.setPrescaleFactor(72/18);
-      timer.setOverflow(newTime*18);
-    }else
-    if (newTime < 65536/16) {
-      timer.setPrescaleFactor(72/16);
-      timer.setOverflow(newTime*16);
-    }else
-    if (newTime < 65536/8) {
-      timer.setPrescaleFactor(72/8);
-      timer.setOverflow(newTime*8);
-    }else
-/*    if (newTime < 65536/4) {
-      timer.setPrescaleFactor(72/4);
-      timer.setOverflow(newTime*4);
-    }else
-    if (newTime < 65536/2) {
-      timer.setPrescaleFactor(72/2);
-      timer.setOverflow(newTime*2);
-    }else */
-    if (newTime < 65536) {
-      timer.setPrescaleFactor(72);
-      timer.setOverflow(newTime);
-    }else
-    if (newTime < 65536*2) {
-      timer.setPrescaleFactor(72*2);
-      timer.setOverflow(newTime/2);
-    }else
-    if (newTime < 65536*4) {
-      timer.setPrescaleFactor(72*4);
-      timer.setOverflow(newTime/4);
-    }else
-    if (newTime < 65536*8) {
-      timer.setPrescaleFactor(72*8);
-      timer.setOverflow(newTime/8);
-    }else
-/*    if (newTime < 65536*16) {
-      timer.setPrescaleFactor(72*16);
-      timer.setOverflow(newTime/16);
-    }else
-    if (newTime < 65536*32) {
-      timer.setPrescaleFactor(72*32);
-      timer.setOverflow(newTime/32);
-    }else */
-    if (newTime < 65536*64) {
-      timer.setPrescaleFactor(72*64);
-      timer.setOverflow(newTime/64);
-    }else
-/*    if (newTime < 65536*128) {
-      timer.setPrescaleFactor(72*128);
-      timer.setOverflow(newTime/128);
-    }else
-    if (newTime < 65536*256) {
-      timer.setPrescaleFactor(72*256);
-      timer.setOverflow(newTime/256);
-    }else */
-    if (newTime < 65536*512) {                                    
-      timer.setPrescaleFactor(72*512);
-      timer.setOverflow(newTime/512);
-    }else {                           
-      timer.setPrescaleFactor(72*512);
-      timer.setOverflow(65535);      
-    }
-      timer.refresh();
+    //timer.setPeriod(newTime);    
+    timer.setSTM32Period(newTime);
   #endif
-
 }
-
-
 
 void writeHeader2() {
   //Convert byte from HDR Vector String into string of pulses and calculate checksum. One pulse per pass

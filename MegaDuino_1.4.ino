@@ -553,7 +553,27 @@ void loop(void) {
         }        
         printtext(PlayBytes,0);
      }
-     #if defined(LCD16) && defined(SHOW_BLOCKPOS_LCD)
+     #if defined(LCD16) || defined(LCD20) && defined(SHOW_BLOCKPOS_LCD)
+       if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
+         if defined(LCD16)
+           lcd.setCursor(11,0);
+         if defined (LCD20)
+           lcd.setCursor(13,0);
+         if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
+           else lcd.print(F("%^OFF"));  
+        while(digitalRead(btnRoot)==LOW && start==1 && !lastbtn) {
+         lastbtn = 1;
+         checkLastButton();           
+        }
+        lcd.setCursor(11,0);
+        lcd.print(' ');
+        lcd.print(' ');
+        lcd.print(PlayBytes);        
+       }
+     #endif
+     
+     
+/*     #if defined(LCD16) && defined(SHOW_BLOCKPOS_LCD)
        if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
         lcd.setCursor(11,0);
          if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
@@ -583,6 +603,7 @@ void loop(void) {
         lcd.print(PlayBytes);        
        }
      #endif
+*/
 #endif  
 
 if(digitalRead(btnRoot)==LOW && start==0
