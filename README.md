@@ -8,6 +8,12 @@ Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and other
 
 Thanks to the sixth button included in the MegaDuino project (board & components are cased) there is the possibility of deleting files or doing a reset of the board (whithout opening the case).
 
+# ATTENTION
+
+* All files must be copied to a folder called -> **MegaDuino_1.4**
+
+# Versions
+
 * Version 1.4 - August 16, 2021
   - Fixed some bugs on ID19 & ID21 Block Types
 * Version 1.3 - March 3, 2021
