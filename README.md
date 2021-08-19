@@ -10,7 +10,7 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 # ATTENTION
 
-* All files must be copied to a folder called -> **MegaDuino_1.4**
+* All files must be copied to a folder named -> **MegaDuino_1.4**
 
 # Versions
 
