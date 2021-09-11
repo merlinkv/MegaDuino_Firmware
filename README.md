@@ -10,10 +10,13 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 # ATTENTION
 
-* All files must be copied to a folder named -> **MegaDuino_1.4**
+* All files must be copied to a folder named -> **MegaDuino_1.5**
 
 # Versions
 
+* Version 1.5 - September 11, 2021
+  - Some optimizations for Arcon, Oric, Dragon & Camputerx Lynx
+  - Corrected block counter for TSX files (MSX)
 * Version 1.4 - August 16, 2021
   - Fixed some bugs on ID19 & ID21 Block Types
 * Version 1.3 - March 3, 2021
