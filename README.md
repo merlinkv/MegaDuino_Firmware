@@ -39,4 +39,3 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 - https://www.winuaespanol.com/phpbb3/viewtopic.php?f=32&t=519
 - https://www.va-de-retro.com/foros/viewtopic.php?f=63&t=5541
 - https://github.com/rcmolina
-
