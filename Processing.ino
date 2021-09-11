@@ -182,10 +182,16 @@ void TZXProcess() {
             }
  #endif
          } else {
-             chunkID = IDCHUNKEOF;
+             //chunkID = IDCHUNKEOF;
+            currentTask = PROCESSID;
+            currentID =IDEOF;
+            return;            
          }
       } else {
-        chunkID = IDCHUNKEOF;
+        //chunkID = IDCHUNKEOF;
+        currentTask = PROCESSID;
+        currentID =IDEOF;
+        return;      
       }
       //if (!(TSXCONTROLzxpolarityUEFSWITCHPARITY)) {
       if ( BAUDRATE == 1200) {
@@ -389,21 +395,35 @@ void TZXProcess() {
 #endif
 
 #ifdef Use_UEF
-        case IDCHUNKEOF:
-          //Serial.println(F("IDCHUNKEOF"));
-          bytesRead+=bytesToRead;
-          stopFile();
-          return;
-        default:
-          //Serial.print(F("Skip id "));
-          //Serial.print(chunkID);
-          bytesRead+=bytesToRead;
-          currentTask = GETCHUNKID;
-          break;
-            
-      }
-      //currentTask = GETCHUNKID;
-    }      
+//  case IDCHUNKEOF:
+//  Serial.println(F("IDCHUNKEOF"));
+//  bytesRead+=bytesToRead;
+//  stopFile();
+//  return;
+//  if(!count==0) {
+//    currentPeriod = 32768 + 4096 + 10;
+//    count += -1;
+//  } else {
+//    bytesRead+=bytesToRead;
+//    stopFile();
+//    return;
+//  }
+//  DelayedStop();
+//  return;
+//  currentTask = PROCESSID;
+//  currentID =IDEOF;
+//  return;
+//  break;
+                         
+  default:
+//  Serial.print(F("Skip id "));
+//  Serial.print(chunkID);
+    bytesRead+=bytesToRead;
+    currentTask = GETCHUNKID;
+    break;
+    }
+//  currentTask = GETCHUNKID;
+  }      
 #endif
     
     if(currentTask == GETID) {
@@ -1322,19 +1342,7 @@ void TZXProcess() {
                 break;
                 
             case PAUSE:
-                //currentPeriod = 100; // 100ms pause
-                //bitSet(currentPeriod, 15);
-                if(!count==0) {
-                  #if defined(__AVR__)
-                    currentPeriod = 32769;
-                  #elif defined(__arm__) && defined(__STM32F1__)
-                    currentPeriod = 50;
-                  #endif
-                  count += -1;
-                } else {
-                  count= 100;
-                  currentBlockTask=SYNC1;
-                }
+                FlushBuffer(100);
                 break;                
           }
           break;
@@ -1390,7 +1398,14 @@ void TZXProcess() {
           if(!count==0) {
           
           #if defined(__AVR__)
+            //currentPeriod = 32769;
+            //currentPeriod = 10;
+            
             currentPeriod = 10;
+            bitSet(currentPeriod, 15);
+            //bitSet(currentPeriod, 12); 
+            bitSet(currentPeriod, 13);
+            
           #elif defined(__arm__) && defined(__STM32F1__)
             currentPeriod = 50;
           #endif
@@ -2454,3 +2469,45 @@ void ReadAYHeader() {
     bytesRead =12;
   }
 #endif
+void DelayedStop() {
+          //Handle end of file
+          if(!count==0) {
+          
+          #if defined(__AVR__)
+            //currentPeriod = 32769;
+            //currentPeriod = 10;
+            
+            currentPeriod = 10;
+            bitSet(currentPeriod, 15); 
+            //bitSet(currentPeriod, 12);
+            bitSet(currentPeriod, 13);
+            
+          #elif defined(__arm__) && defined(__STM32F1__)
+            currentPeriod = 50;
+          #endif
+                 
+            count += -1;
+          } else {
+            stopFile();
+            return;
+          }       
+}
+void FlushBuffer(long newcount) {
+    //currentPeriod = 100; // 100ms pause
+    //bitSet(currentPeriod, 15);
+    if(!count==0) {
+
+    #if defined(__AVR__)
+      currentPeriod = 32769;
+      //currentPeriod = 32768 + 4096 + 10;
+    #elif defined(__arm__) && defined(__STM32F1__)
+      currentPeriod = 50;
+    #endif
+
+      count += -1;
+    } else {
+      count= newcount;
+      currentBlockTask=SYNC1;
+      return;
+    }  
+}

@@ -13,6 +13,7 @@
 #define Use_CAS                 // .cas files playback on MSX / Dragon / CoCo Tandy computers
 #define Use_DRAGON
 #define Use_Dragon_sLeader      // short Leader of 0x55 allowed for loading TOSEC files
+#define Expand_All              // Expand short Leaders in ALL file header blocks.
 #define Use_UEF                 // .uef files playback on BBC Micro / Electron / Atom computers
 #define Use_c112                // integer gap chunk for .uef
 #define Use_hqUEF               // .hq.uef files playback on BBC Micro / Electron / Atom computers
@@ -52,11 +53,11 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 // Uncomment next options to select LCD screens. Remember to comment the OLED options
 // ==================================================================================
 
-#define LCD_I2C_ADDR    0x27  // Set the i2c address of your 1602LCD or 2004A usually 0x27 but can be 3f, just test.
+//#define LCD_I2C_ADDR    0x27  // Set the i2c address of your 1602LCD or 2004A usually 0x27 but can be 3f, just test.
 //#define LCD16               // Set if you are using a 1602 LCD screen
-#define LCD20                 // Set if you are using a 2004A LCD screen
-#define SHOW_STATUS_LCD
-#define SHOW_BLOCKPOS_LCD
+//#define LCD20                 // Set if you are using a 2004A LCD screen
+//#define SHOW_STATUS_LCD
+//#define SHOW_BLOCKPOS_LCD
 
 // ==================================================================================
 
@@ -64,12 +65,12 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 // Uncomment next options to select OLED screens. Remember to comment the LCD options
 // ==================================================================================
 
-//#define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
-//#define OLED_ROTATE180
-//#define OLED_address   0x3C         // 0x3C or 0x3D
-//#define OLED1306                    // Set if you are using OLED 1306 display
-//#define OLED1306_128_64             // 128x64 resolution with 8 rows
-//#define OLED1106_1_3                // Use this line as well if you have a 1.3" OLED screen
+#define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
+#define OLED_ROTATE180
+#define OLED_address   0x3C         // 0x3C or 0x3D
+#define OLED1306                    // Set if you are using OLED 1306 display
+#define OLED1306_128_64             // 128x64 resolution with 8 rows
+#define OLED1106_1_3                // Use this line as well if you have a 1.3" OLED screen
 
 // ==================================================================================
 
@@ -101,6 +102,7 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 #define TIMEOUT_RESET   60 // Timeout for reset tzxduino (without pause or play activated), comment to not reset.
 //#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
 #define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
+#define BLOCKID_NOMEM_SEARCH          // Loop and search for a block
 #define maxblock 99                   // maxblock if not using EEPROM
 #define BLOCKID21_IN
 #define BLOCKTAP_IN

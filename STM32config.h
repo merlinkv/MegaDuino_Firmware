@@ -33,7 +33,7 @@ int BAUDRATE = 3600;
 byte scale = 2;                         // 1 for BAUDRATE 1200
 int period = 70;                        // 208 for BAUDRATE=1200
 byte mselectMask = 1;                   // Motor control state 1=on 0=off
-byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 1;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
+byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
                                         //            Mask // SpeedControl for .tsx // UEF Switch Parity
 byte skip2A = 0;                        // Pause on for BLK:2A
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +85,8 @@ byte lineaxy=2;
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
 #define TIMEOUT_RESET   60 // Timeout for reset tzxduino (without pause or play activated), comment to not reset.
 //#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
-#define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
+//#define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
+#define BLOCKID_NOMEM_SEARCH          // Loop and search for a block
 #define maxblock 99                   // maxblock if not using EEPROM
 #define BLOCKID21_IN
 #define BLOCKTAP_IN
