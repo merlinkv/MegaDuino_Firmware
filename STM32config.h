@@ -1,21 +1,26 @@
+////////////////                        CONFIG FOR NEW ARDUINO MEGA2560                        ////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*                 Add // at the beginning of lines to comment and remove selected option                                */
+//**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
 #define Use_MENU                          // removing menu saves space
 #define AYPLAY
 #define MenuBLK2A
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
-#define ID19REW                           // trace id19 block for zx81 .tzx to be rewinded
+#define ID19REW                 // trace id19 block for zx81 .tzx to be rewinded
 #define tapORIC
 #define ORICSPEEDUP
-#define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
+#define Use_CAS                 // .cas files playback on MSX / Dragon / CoCo Tandy computers
 #define Use_DRAGON
-#define Use_Dragon_sLeader                // short Leader of 0x55 allowed for loading TOSEC files
-#define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
-#define Use_c112                          // integer gap chunk for .uef
-#define Use_hqUEF                         // .hq.uef files playback on BBC Micro / Electron / Atom computers
-#define Use_c104                          // defined tape format data block: data bits per packet/parity/stop bits    
-//#define Use_c114                // security cycles replaced with carrier tone
-//#define Use_c116                // floating point gap chunk for .hq.uef
-//#define Use_c117                // data encoding format change for 300 bauds
+#define Use_Dragon_sLeader      // short Leader of 0x55 allowed for loading TOSEC files
+#define Expand_All              // Expand short Leaders in ALL file header blocks.
+#define Use_UEF                 // .uef files playback on BBC Micro / Electron / Atom computers
+#define Use_c112                // integer gap chunk for .uef
+#define Use_hqUEF               // .hq.uef files playback on BBC Micro / Electron / Atom computers
+#define Use_c104                // defined tape format data block: data bits per packet/parity/stop bits    
+//#define Use_c114              // security cycles replaced with carrier tone
+//#define Use_c116              // floating point gap chunk for .hq.uef
+#define Use_c117              // data encoding format change for 300 bauds
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //         UEF file instructions: UEF files are compressed and can not be executed directly in MAXDUINO,                 //
 /*         for that you have to decompress these files manually.                                                         */
@@ -35,48 +40,59 @@ int period = 70;                        // 208 for BAUDRATE=1200
 byte mselectMask = 1;                   // Motor control state 1=on 0=off
 byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
                                         //            Mask // SpeedControl for .tsx // UEF Switch Parity
-byte skip2A = 0;                        // Pause on for BLK:2A
+byte skip2A = 1;                        // Pause on for BLK:2A
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                   Configure your screen settings here                                                  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set defines for various types of screen
 
-//#define SERIALSCREEN              // For testing and debugging
+//#define SERIALSCREEN              // For testing and debugging 
 
-//#define LCD_I2C_ADDR    0x27        // Set the i2c address of your 1602LCD usually 0x27
-//#define LCD_I2C_ADDR    0x3f        // Set the i2c address of your 1602LCD usually 0x3f
-//#define LCDSCREEN16x2               // Set if you are using a 1602 LCD screen
+
+// ==================================================================================
+// Uncomment next options to select LCD screens. Remember to comment the OLED options
+// ==================================================================================
+
+#define LCD_I2C_ADDR    0x27  // Set the i2c address of your 1602LCD or 2004A usually 0x27 but can be 3f, just test.
+//#define LCD16               // Set if you are using a 1602 LCD screen
+#define LCD20                 // Set if you are using a 2004A LCD screen
+#define SHOW_STATUS_LCD
+#define SHOW_BLOCKPOS_LCD
+
+// ==================================================================================
+
+// ==================================================================================
+// Uncomment next options to select OLED screens. Remember to comment the LCD options
+// ==================================================================================
 
 //#define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
-#define OLED_ROTATE180
-#define OLED_address   0x3C           //0x3C or 0x3D
-#define OLED1306                      // Set if you are using OLED 1306 display
-    //#define OLED1306_128_64         // 128x64 resolution with 8 rows
-    //#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
-    //#define video64text32    
-//#define P8544                       // Set if you are Display Nokia 5110 display
+//#define OLED_ROTATE180
+//#define OLED_address   0x3C         // 0x3C or 0x3D
+//#define OLED1306                    // Set if you are using OLED 1306 display
+//#define OLED1306_128_64             // 128x64 resolution with 8 rows
+//#define OLED1106_1_3                // Use this line as well if you have a 1.3" OLED screen
 
+// ==================================================================================
+
+#define SHOW_DIRPOS
+//#define video64text32
 //#define btnRoot_AS_PIVOT
-  #define SHOW_DIRPOS
-      //#define SHOW_STATUS_LCD
-      //#define SHOW_DIRNAMES
-      
-  #define SHOW_BLOCKPOS_LCD
+#define SHOW_DIRNAMES
   
 #define XY                         // use original settings for Oled line 0,1 and status for menu
 //#define XY2                      // use double size font wihtout status line for menu
 //#define XY2force
 #ifdef XY
-byte lineaxy=1;
+  byte lineaxy=1;
 #endif
 #ifdef XY2
-byte lineaxy=2;
+  byte lineaxy=2;
 #endif
 
 #define SHOW_CNTR
 #define SHOW_PCT
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss
-#define MAXPAUSE_PERIOD   8300      // millis
+#define MAXPAUSE_PERIOD   8191      // millis
 //#define MAXPAUSE_PERIOD   520     // millis  
 #define ONPAUSE_POLCHG 
 #define BLOCKMODE                   // REW or FF a block when in pause and Play to select it 
@@ -85,7 +101,7 @@ byte lineaxy=2;
 //#define SPLASH_SCREEN   1  // Displays the logo and welcome text at the initialization and remains until a button is pressed.
 #define TIMEOUT_RESET   60 // Timeout for reset tzxduino (without pause or play activated), comment to not reset.
 //#define BLOCK_EEPROM_PUT            // must be disabled if loading many turbo short blocks, as in Amstrad cpc demo Breaking Baud
-//#define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
+#define BLOCKID_INTO_MEM              // enable for blockid recording and later rewinding if EEPROM_PUT is disabled.
 #define BLOCKID_NOMEM_SEARCH          // Loop and search for a block
 #define maxblock 99                   // maxblock if not using EEPROM
 #define BLOCKID21_IN
@@ -106,9 +122,9 @@ byte lineaxy=2;
 
 //#define COMPRESS_REPEAT_ROW
 //#define EEPROM_LOGO_COMPRESS
-//#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
+#define LOAD_MEM_LOGO             // legacy, logo is not in EEPROM then wasting memory.
 //#define RECORD_EEPROM_LOGO        // Uncommenting RECORD_EEPROM deactivates #define Use_MENU
-#define LOAD_EEPROM_LOGO 
+//#define LOAD_EEPROM_LOGO 
 
 #if defined(OLED1306_128_64) || defined(video64text32)
   //#define Maxduino2Alf              // new Maxduino2 logo 128x64 by Alfredo Retrocant
@@ -116,8 +132,8 @@ byte lineaxy=2;
   //#define Cinta1                    // Cassette logo by MerlinKV
   //#define MegaDuino1                // MegaDuino logo by MerlinKV
   //#define MegaDuino2                // MaxDuino MEGA logo by MerlinKV
-  //#define MegaDuino3                // MegaDuino logo by MerlinKV
-  #define MegaDuino4                  // MegaDuino logo by MerlinKV   
+  #define MegaDuino3                  // MegaDuino logo by MerlinKV
+  //#define MegaDuino4                // MegaDuino logo by MerlinKV   
   //#define MegaDuino5                // MegaDuino logo by MerlinKV      
   //#define EmptyLogo                 // to erase
   //#define CosmicCruiser             // Dragon32 CosmicCruiser by rcmolina
@@ -183,8 +199,8 @@ byte lineaxy=2;
   //#define SUGARLESS_1              // new logo cretaed bt YoxxxoY
   //#define SUGARLESS_2              // new logo created by YoxxxoY
   //#define LOGOMINIDUINO            // new logo for A.Villena's Miniduino by rcmolina
-
 #endif
+
 /////////////////////
 //      FONTS      //
 /////////////////////

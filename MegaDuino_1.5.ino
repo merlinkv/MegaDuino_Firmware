@@ -27,8 +27,18 @@
 #ifdef TimerOne
   #include <TimerOne.h>
 #elif defined(__arm__) && defined(__STM32F1__)
-  HardwareTimer timer(2); // channer 2  
-  #include "itoa.h"  
+  //HardwareTimer timer(2); // channel 2
+  #include "TimerCounter.h"
+ 
+/* class TimerCounter: public HardwareTimer
+{
+  public:
+    TimerCounter(uint8 timerNum) : HardwareTimer(timerNum) {};
+    void setSTM32Period(unsigned long microseconds) __attribute__((always_inline)) {}
+};*/
+TimerCounter timer(2);
+
+  #include <itoa.h>  
   #define strncpy_P(a, b, n) strncpy((a), (b), (n))
   #define memcmp_P(a, b, n) memcmp((a), (b), (n))  
 #else
@@ -39,11 +49,6 @@
   unsigned char TimerCounter::clockSelectBits = 0;
   void (*TimerCounter::isrCallback)() = NULL;
   
-  // interrupt service routine that wraps a user defined function supplied by attachInterrupt
-  ISR(TIMER1_OVF_vect)
-  {
-    Timer1.isrCallback();
-  }
 #endif
 
 #ifdef SDFat

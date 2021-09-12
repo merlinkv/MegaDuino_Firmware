@@ -92,7 +92,7 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 #define SHOW_CNTR
 #define SHOW_PCT
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss
-#define MAXPAUSE_PERIOD   8300      // millis
+#define MAXPAUSE_PERIOD   8191      // millis
 //#define MAXPAUSE_PERIOD   520     // millis  
 #define ONPAUSE_POLCHG 
 #define BLOCKMODE                   // REW or FF a block when in pause and Play to select it 
