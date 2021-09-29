@@ -276,8 +276,42 @@ void processDragon()
   lastByte=input[0];
   byte r=0;
   if((r=readfile(1,bytesRead))==1) {
+
+#if defined(Use_CAS) && defined(Use_DRAGON) && defined(Use_Dragon_sLeader) && not defined(Expand_All)
+    if(currentTask==lookHeader) {      
+      if(input[0] == 0x55) {
+       writeByte(0x55); 
+       bytesRead+=1;
+       count--;
+      } else {
+       currentTask=wHeader; 
+      }
+        
+    } else if(currentTask==wHeader) {      
+        if(count>=0) {
+          writeByte(0x55);
+          count--;
+        } else {    
+          if (fileStage > 0) currentTask=wData;
+          else {
+            count =19;
+            currentTask=wNameFileBlk;
+          }
+        }
+    } else if(currentTask==wNameFileBlk) {
+        if(!count==0) {
+            writeByte(input[0]);
+            bytesRead+=1;
+            count--;            
+        } else {            
+            fileStage=1;
+            currentTask=lookHeader;
+            count=255;
+        }
+    } else {        
+#endif
     
-#if defined(Use_CAS) && defined(Use_DRAGON) && defined(Use_Dragon_sLeader)
+#if defined(Use_CAS) && defined(Use_DRAGON) && defined(Use_Dragon_sLeader) && defined(Expand_All)
      
     if(currentTask==lookHeader) {      
       if(input[0] == 0x55) {
@@ -458,5 +492,3 @@ void casduinoLoop()
     } 
 }
 #endif
-
-
