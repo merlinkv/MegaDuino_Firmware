@@ -5,9 +5,6 @@
 // MegaDuino Firmware is an adaptation of the MaxDuino firmware by Rafael Molina but is specially designed for my MegaDuino & MegaDuino STM32 projects
 //
 //
-// Version 1.5 - September 11, 2021
-//   Some optimizations for Arcon, Oric, Dragon & Camputerx Lynx
-//   Corrected block counter for TSX files (MSX)
 // Version 1.4 - August 18, 2021
 //    Fixed some bugs on ID19 & ID21 Block Types
 // Version 1.3 - February 27, 2021
@@ -27,18 +24,8 @@
 #ifdef TimerOne
   #include <TimerOne.h>
 #elif defined(__arm__) && defined(__STM32F1__)
-  //HardwareTimer timer(2); // channel 2
-  #include "TimerCounter.h"
- 
-/* class TimerCounter: public HardwareTimer
-{
-  public:
-    TimerCounter(uint8 timerNum) : HardwareTimer(timerNum) {};
-    void setSTM32Period(unsigned long microseconds) __attribute__((always_inline)) {}
-};*/
-TimerCounter timer(2);
-
-  #include <itoa.h>  
+  HardwareTimer timer(2); // channer 2  
+  #include "itoa.h"  
   #define strncpy_P(a, b, n) strncpy((a), (b), (n))
   #define memcmp_P(a, b, n) memcmp((a), (b), (n))  
 #else
@@ -49,6 +36,11 @@ TimerCounter timer(2);
   unsigned char TimerCounter::clockSelectBits = 0;
   void (*TimerCounter::isrCallback)() = NULL;
   
+  // interrupt service routine that wraps a user defined function supplied by attachInterrupt
+  ISR(TIMER1_OVF_vect)
+  {
+    Timer1.isrCallback();
+  }
 #endif
 
 #ifdef SDFat
@@ -728,12 +720,12 @@ if(digitalRead(btnStop)==LOW && start==1
       if (block > 0) block--;
       else block = maxblock;      
     #endif
-       #if defined(BLOCK_EEPROM_PUT)||defined(BLOCKID_NOMEM_SEARCH)
-         oldMinBlock = 0;
-         oldMaxBlock = 99;
-         if (block > 0) block--;
-         else block = 99;
-       #endif
+    #ifdef BLOCK_EEPROM_PUT
+      oldMinBlock = 0;
+      oldMaxBlock = 99;
+      if (block > 0) block--;
+      else block = 99;
+    #endif
     GetAndPlayBlock();       
     debounce(btnUp);         
   }
@@ -790,18 +782,12 @@ if(digitalRead(btnUp)==LOW && start==0   // up dir sequential search
         if (block < maxblock) block++;
         else block = 0;       
       #endif
-       #if defined(BLOCK_EEPROM_PUT)||defined(BLOCKID_NOMEM_SEARCH)
-         oldMinBlock = 0;
-         oldMaxBlock = 99;
-         if (firstBlockPause) {
-            firstBlockPause = false;
-            if (block > 0) block--;
-            else block = 99;
-         } else {
-            if (block < 99) block++;
-            else block = 0;       
-         }         
-       #endif
+      #ifdef BLOCK_EEPROM_PUT
+        oldMinBlock = 0;
+        oldMaxBlock = 99;
+        if (block < 99) block++;
+        else block = 0;
+      #endif
       GetAndPlayBlock();    
       debounce(btnDown);                  
     }
@@ -1609,25 +1595,6 @@ void SetPlayBlock(){
   }
 }
 
-/* void GetAndPlayBlock() {
-   #ifdef BLOCKID_INTO_MEM
-      bytesRead=blockOffset[block%maxblock];
-      currentID=blockID[block%maxblock];   
-   #endif
-   #ifdef BLOCK_EEPROM_PUT
-      #if defined(__AVR__)
-        EEPROM.get(BLOCK_EEPROM_START+5*block, bytesRead);
-        EEPROM.get(BLOCK_EEPROM_START+4+5*block, currentID);
-      #elif defined(__arm__) && defined(__STM32F1__)
-        EEPROM_get(BLOCK_EEPROM_START+5*block, &bytesRead);
-        EEPROM_get(BLOCK_EEPROM_START+4+5*block, &currentID);
-      #endif      
-   #endif
-   currentTask=PROCESSID; 
-   SetPlayBlock(); 
-}
-*/
-
 void GetAndPlayBlock()
 {
    #ifdef BLOCKID_INTO_MEM
@@ -1645,8 +1612,10 @@ void GetAndPlayBlock()
    #endif
    #ifdef BLOCKID_NOMEM_SEARCH 
       //block=1; //forcing block number for debugging
+      
       bytesRead=0;                          //TAP 
       if (currentID!=TAP) bytesRead=10;   //TZX with blocks skip TZXHeader
+
       int i=1;
       while (i<= block) {
         if (currentID!=TAP) if(ReadByte(bytesRead)==1) currentID = outByte;  //TZX with blocks GETID

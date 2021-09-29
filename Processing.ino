@@ -182,16 +182,10 @@ void TZXProcess() {
             }
  #endif
          } else {
-             //chunkID = IDCHUNKEOF;
-            currentTask = PROCESSID;
-            currentID =IDEOF;
-            return;            
+             chunkID = IDCHUNKEOF;
          }
       } else {
-        //chunkID = IDCHUNKEOF;
-        currentTask = PROCESSID;
-        currentID =IDEOF;
-        return;      
+        chunkID = IDCHUNKEOF;
       }
       //if (!(TSXCONTROLzxpolarityUEFSWITCHPARITY)) {
       if ( BAUDRATE == 1200) {
@@ -395,35 +389,12 @@ void TZXProcess() {
 #endif
 
 #ifdef Use_UEF
-//  case IDCHUNKEOF:
-//  Serial.println(F("IDCHUNKEOF"));
-//  bytesRead+=bytesToRead;
-//  stopFile();
-//  return;
-//  if(!count==0) {
-//    currentPeriod = 32768 + 4096 + 10;
-//    count += -1;
-//  } else {
-//    bytesRead+=bytesToRead;
-//    stopFile();
-//    return;
-//  }
-//  DelayedStop();
-//  return;
-//  currentTask = PROCESSID;
-//  currentID =IDEOF;
-//  return;
-//  break;
-                         
-  default:
-//  Serial.print(F("Skip id "));
-//  Serial.print(chunkID);
-    bytesRead+=bytesToRead;
-    currentTask = GETCHUNKID;
-    break;
-    }
-//  currentTask = GETCHUNKID;
-  }      
+        default:
+          bytesRead+=bytesToRead;
+          currentTask = GETCHUNKID;
+          break;
+      }
+    }      
 #endif
     
     if(currentTask == GETID) {
@@ -727,7 +698,6 @@ void TZXProcess() {
                       EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
                     #endif                   
               #endif
-        //#ifdef ID19REW                
               #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                     #ifdef XY
                       setXY(3,3);
@@ -746,7 +716,6 @@ void TZXProcess() {
                       #ifdef XY2force
                         sendStrXY("19",7,4);
                         if ((block%10) == 0) {itoa(block/10,input,10);sendStrXY(input,14,4);}
-                        //itoa(block%10,input,10);sendStrXY(input,15,4);
                         input[0]=48+block%10;input[1]=0;sendStrXY(input,15,4);                     
                       #else 
                         setXY(7,4);sendChar('1');sendChar('9');                    
@@ -755,12 +724,10 @@ void TZXProcess() {
                       #endif
                     #endif                    
               #endif
-        //#endif              
               #ifdef BLOCKID_INTO_MEM
                 if (block < maxblock) block++;
                 else block = 0; 
-              #endif
-              #ifdef BLOCK_EEPROM_PUT       
+              #else      
                 if (block < 99) block++;
                 else block = 0; 
               #endif 
@@ -771,18 +738,14 @@ void TZXProcess() {
                 #endif
               }
               if(r=ReadWord(bytesRead)==2) {
-                //Pause after this block in milliseconds
                 pauseLength = outWord;
                 #ifdef ID19REW
-                  //bytesToRead += -2;
                 #endif              
               }
               bytesRead += 86 ;  // skip until DataStream filename
               #ifdef ID19REW
-                //bytesToRead += -86 ; // skip SYMDEF bytes inside block ID                       
                 bytesToRead += -88 ;    // pauseLength + SYMDEFs
               #endif
-              //currentChar=0;
               currentBlockTask=PAUSE;
             break;
             case PAUSE:
@@ -953,7 +916,7 @@ void TZXProcess() {
           }
           currentTask = GETID;
         break;
-        
+
         case ID4B:
           //Process ID4B - Kansas City Block (MSX specific implementation only)
           switch(currentBlockTask) {
@@ -971,7 +934,6 @@ void TZXProcess() {
                   EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
                 #endif                 
               #endif
-
               #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                     #ifdef XY
                       setXY(3,3);
@@ -990,19 +952,18 @@ void TZXProcess() {
                       #ifdef XY2force
                         sendStrXY("4B",7,4);
                         if ((block%10) == 0) {itoa(block/10,input,10);sendStrXY(input,14,4);}
-                        itoa(block%10,input,10);sendStrXY(input,15,4);                      
+                        input[0]=48+block%10;input[1]=0;sendStrXY(input,15,4);                     
                       #else
                         setXY(7,4);sendChar('4');sendChar('B');                    
                         setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
                         setXY(15,4);sendChar(48+block%10);
                       #endif
-                    #endif  
+                    #endif                    
               #endif     
               #ifdef BLOCKID_INTO_MEM
                 if (block < maxblock) block++;
                 else block = 0; 
-              #endif
-              #ifdef BLOCK_EEPROM_PUT       
+              #else      
                 if (block < 99) block++;
                 else block = 0; 
               #endif 
@@ -1342,7 +1303,19 @@ void TZXProcess() {
                 break;
                 
             case PAUSE:
-                FlushBuffer(100);
+                //currentPeriod = 100; // 100ms pause
+                //bitSet(currentPeriod, 15);
+                if(!count==0) {
+                  #if defined(__AVR__)
+                    currentPeriod = 32769;
+                  #elif defined(__arm__) && defined(__STM32F1__)
+                    currentPeriod = 50;
+                  #endif
+                  count += -1;
+                } else {
+                  count= 100;
+                  currentBlockTask=SYNC1;
+                }
                 break;                
           }
           break;
@@ -1398,14 +1371,7 @@ void TZXProcess() {
           if(!count==0) {
           
           #if defined(__AVR__)
-            //currentPeriod = 32769;
-            //currentPeriod = 10;
-            
             currentPeriod = 10;
-            bitSet(currentPeriod, 15);
-            //bitSet(currentPeriod, 12); 
-            bitSet(currentPeriod, 13);
-            
           #elif defined(__arm__) && defined(__STM32F1__)
             currentPeriod = 50;
           #endif
@@ -2469,45 +2435,3 @@ void ReadAYHeader() {
     bytesRead =12;
   }
 #endif
-void DelayedStop() {
-          //Handle end of file
-          if(!count==0) {
-          
-          #if defined(__AVR__)
-            //currentPeriod = 32769;
-            //currentPeriod = 10;
-            
-            currentPeriod = 10;
-            bitSet(currentPeriod, 15); 
-            //bitSet(currentPeriod, 12);
-            bitSet(currentPeriod, 13);
-            
-          #elif defined(__arm__) && defined(__STM32F1__)
-            currentPeriod = 50;
-          #endif
-                 
-            count += -1;
-          } else {
-            stopFile();
-            return;
-          }       
-}
-void FlushBuffer(long newcount) {
-    //currentPeriod = 100; // 100ms pause
-    //bitSet(currentPeriod, 15);
-    if(!count==0) {
-
-    #if defined(__AVR__)
-      currentPeriod = 32769;
-      //currentPeriod = 32768 + 4096 + 10;
-    #elif defined(__arm__) && defined(__STM32F1__)
-      currentPeriod = 50;
-    #endif
-
-      count += -1;
-    } else {
-      count= newcount;
-      currentBlockTask=SYNC1;
-      return;
-    }  
-}
