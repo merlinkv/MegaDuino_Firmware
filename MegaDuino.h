@@ -234,6 +234,7 @@ volatile byte currentChar=0;
 volatile byte currentByte=0;
 
 byte block = 0;
+byte jblks = 1;
 byte oldMinBlock = 0;
 #ifdef BLOCK_EEPROM_PUT
   byte oldMaxBlock = 99;

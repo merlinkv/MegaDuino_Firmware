@@ -182,10 +182,16 @@ void TZXProcess() {
             }
  #endif
          } else {
-             chunkID = IDCHUNKEOF;
+             //chunkID = IDCHUNKEOF;
+            currentTask = PROCESSID;
+            currentID =IDEOF;
+            return;            
          }
       } else {
-        chunkID = IDCHUNKEOF;
+        //chunkID = IDCHUNKEOF;
+        currentTask = PROCESSID;
+        currentID =IDEOF;
+        return;      
       }
       //if (!(TSXCONTROLzxpolarityUEFSWITCHPARITY)) {
       if ( BAUDRATE == 1200) {
@@ -310,17 +316,11 @@ void TZXProcess() {
           if(currentBlockTask==READPARAM){
             if(r=ReadWord(bytesRead)==2) {
               if (outWord>0) {
-                //Serial.print(F("delay="));
-                //Serial.println(outWord,DEC);
-                temppause = outWord;
-                
-                currentID = IDPAUSE;
+                temppause = outWord*2;
                 currentPeriod = temppause;
                 bitSet(currentPeriod, 15);
-                currentTask = GETCHUNKID;
-              } else {
-                currentTask = GETCHUNKID;
               }     
+              currentTask = GETCHUNKID;              
             }
           } 
           break;
@@ -439,13 +439,13 @@ void TZXProcess() {
                   setXY(10,3);
                   //    if (block == 0) sendChar('0');
                   //    if (block == 10) sendChar('1');
-                  if ((block%10) == 0) sendChar(48+block/10);  
+                  if ((block%10) == 0) sendChar(48+(block/10)%10);
                     setXY(11,3);
                     sendChar(48+block%10);   
                   #endif
                   #if defined(XY2) && not defined(OLED1306_128_64)
                     setXY(9,1);sendChar('1');sendChar('0');                    
-                    setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                    setXY(12,1);if ((block%10) == 0) sendChar(48+(block/10)%10);
                     setXY(13,1);sendChar(48+block%10);
                   #endif
                   #if defined(XY2) && defined(OLED1306_128_64)
@@ -455,20 +455,23 @@ void TZXProcess() {
                         //itoa(block%10,input,10);sendStrXY(input,15,4);
                       input[0]=48+block%10;input[1]=0;sendStrXY(input,15,4);
                     #else                      
-                      setXY(7,4);sendChar('1');sendChar('0');
-                      setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(15,4);sendChar(48+block%10);
+                      setXY(3,3);sendChar('1');sendChar('0');
+                      setXY(10,3);if ((block%10) == 0) sendChar(48+(block/10)%10);
+                      setXY(11,3);sendChar(48+block%10);
                     #endif
                   #endif                    
               #endif
-              #ifdef BLOCKID_INTO_MEM
+              #if defined(BLOCKID_INTO_MEM)
                 if (block < maxblock) block++;
                 else block = 0; 
               #endif
-              #ifdef BLOCK_EEPROM_PUT       
+              #if defined(BLOCK_EEPROM_PUT)
                 if (block < 99) block++;
                 else block = 0; 
-              #endif              
+              #endif
+              #if defined(BLOCKID_NOMEM_SEARCH) 
+                block++;
+              #endif                             
               if(r=ReadWord(bytesRead)==2) {
                 pauseLength = outWord;
               }
@@ -525,13 +528,13 @@ void TZXProcess() {
                   setXY(10,3);
                   //    if (block == 0) sendChar('0');
                   //    if (block == 10) sendChar('1');
-                  if ((block%10) == 0) sendChar(48+block/10);  
+                  if ((block%10) == 0) sendChar(48+(block/10)%10);  
                   setXY(11,3);
                   sendChar(48+block%10);   
                 #endif
                 #if defined(XY2) && not defined(OLED1306_128_64)
                   setXY(9,1);sendChar('1');sendChar('1');                      
-                  setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                  setXY(12,1);if ((block%10) == 0) sendChar(48+(block/10)%10);
                   setXY(13,1);sendChar(48+block%10);
                 #endif
                 #if defined(XY2) && defined(OLED1306_128_64)
@@ -541,20 +544,23 @@ void TZXProcess() {
                     //itoa(block%10,input,10);sendStrXY(input,15,4);
                     input[0]=48+block%10;input[1]=0;sendStrXY(input,15,4);                
                   #else
-                    setXY(7,4);sendChar('1');sendChar('1');                    
-                    setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
-                    setXY(15,4);sendChar(48+block%10);
+                    setXY(3,3);sendChar('1');sendChar('1');                    
+                    setXY(10,3);if ((block%10) == 0) sendChar(48+(block/10)%10);
+                    setXY(11,3);sendChar(48+block%10);
                   #endif
                 #endif                    
               #endif   
-              #ifdef BLOCKID_INTO_MEM
+              #if defined(BLOCKID_INTO_MEM)
                 if (block < maxblock) block++;
                 else block = 0; 
               #endif
-              #ifdef BLOCK_EEPROM_PUT       
+              #if defined(BLOCK_EEPROM_PUT)
                 if (block < 99) block++;
                 else block = 0; 
-              #endif            
+              #endif
+              #if defined(BLOCKID_NOMEM_SEARCH) 
+                block++;
+              #endif                           
               if(r=ReadWord(bytesRead)==2) {
                 pilotLength = TickToUs(outWord);
               }
@@ -703,13 +709,13 @@ void TZXProcess() {
                       setXY(3,3);
                       sendChar('1');sendChar('9');
                       setXY(10,3);
-                      if ((block%10) == 0) sendChar(48+block/10);  
+                      if ((block%10) == 0) sendChar(48+(block/10)%10);  
                       setXY(11,3);
                       sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
                       setXY(9,1);sendChar('1');sendChar('9');                     
-                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);if ((block%10) == 0) sendChar(48+(block/10)%10);
                       setXY(13,1);sendChar(48+block%10);
                     #endif
                     #if defined(XY2) && defined(OLED1306_128_64)
@@ -718,19 +724,23 @@ void TZXProcess() {
                         if ((block%10) == 0) {itoa(block/10,input,10);sendStrXY(input,14,4);}
                         input[0]=48+block%10;input[1]=0;sendStrXY(input,15,4);                     
                       #else 
-                        setXY(7,4);sendChar('1');sendChar('9');                    
-                        setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
-                        setXY(15,4);sendChar(48+block%10);
+                        setXY(3,3);sendChar('1');sendChar('9');                    
+                        setXY(10,3);if ((block%10) == 0) sendChar(48+(block/10)%10);
+                        setXY(11,3);sendChar(48+block%10);
                       #endif
                     #endif                    
               #endif
-              #ifdef BLOCKID_INTO_MEM
+              #if defined(BLOCKID_INTO_MEM)
                 if (block < maxblock) block++;
-                else block = 0; 
-              #else      
+                else block = 0;
+              #endif
+              #if defined(BLOCK_EEPROM_PUT) 
                 if (block < 99) block++;
                 else block = 0; 
-              #endif 
+              #endif
+              #if defined(BLOCKID_NOMEM_SEARCH) 
+                block++;
+              #endif                 
         #endif
               if(r=ReadDword(bytesRead)==4) {
                 #ifdef ID19REW
@@ -795,13 +805,13 @@ void TZXProcess() {
                       setXY(3,3);
                       sendChar('2');sendChar('1');
                       setXY(10,3);
-                      if ((block%10) == 0) sendChar(48+block/10);  
+                      if ((block%10) == 0) sendChar(48+(block/10)%10);  
                       setXY(11,3);
                       sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
                       setXY(9,1);sendChar('2');sendChar('1');                      
-                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);if ((block%10) == 0) sendChar(48+(block/10)%10);
                       setXY(13,1);sendChar(48+block%10);
                     #endif
                     #if defined(XY2) && defined(OLED1306_128_64)
@@ -810,9 +820,9 @@ void TZXProcess() {
                         if ((block%10) == 0) {itoa(block/10,input,10);sendStrXY(input,14,4);}
                         input[0]=48+block%10;input[1]=0;sendStrXY(input,15,4);                     
                       #else
-                        setXY(7,4);sendChar('2');sendChar('1');                    
-                        setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
-                        setXY(15,4);sendChar(48+block%10);
+                        setXY(3,3);sendChar('2');sendChar('1');                    
+                        setXY(10,3);if ((block%10) == 0) sendChar(48+(block/10)%10);
+                        setXY(11,3);sendChar(48+block%10);
                       #endif
                     #endif                    
                 #endif     
@@ -823,7 +833,10 @@ void TZXProcess() {
                 #if defined(BLOCK_EEPROM_PUT)
                   if (block < 99) block++;
                   else block = 0; 
-                #endif            
+                #endif
+                #if defined(BLOCKID_NOMEM_SEARCH) 
+                  block++;
+                #endif                               
           #endif
           if(r=ReadByte(bytesRead)==1) {
             bytesRead += outByte;
@@ -936,16 +949,13 @@ void TZXProcess() {
               #endif
               #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
                     #ifdef XY
-                      setXY(3,3);
-                      sendChar('4');sendChar('B');
-                      setXY(10,3);
-                      if ((block%10) == 0) sendChar(48+block/10);  
-                      setXY(11,3);
-                      sendChar(48+block%10);   
+                      setXY(3,3); sendChar('4');sendChar('B');
+                      setXY(10,3); if ((block%10) == 0) sendChar(48+(block/10)%10);  
+                      setXY(11,3); sendChar(48+block%10);   
                     #endif
                     #if defined(XY2) && not defined(OLED1306_128_64)
                       setXY(9,1);sendChar('4');sendChar('B');                     
-                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
+                      setXY(12,1);if ((block%10) == 0) sendChar(48+(block/10)%10);
                       setXY(13,1);sendChar(48+block%10);
                     #endif
                     #if defined(XY2) && defined(OLED1306_128_64)
@@ -954,19 +964,23 @@ void TZXProcess() {
                         if ((block%10) == 0) {itoa(block/10,input,10);sendStrXY(input,14,4);}
                         input[0]=48+block%10;input[1]=0;sendStrXY(input,15,4);                     
                       #else
-                        setXY(7,4);sendChar('4');sendChar('B');                    
-                        setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
-                        setXY(15,4);sendChar(48+block%10);
+                        setXY(3,3);sendChar('4');sendChar('B');                    
+                        setXY(10,3);if ((block%10) == 0) sendChar(48+(block/10)%10);
+                        setXY(11,3);sendChar(48+block%10);
                       #endif
                     #endif                    
               #endif     
-              #ifdef BLOCKID_INTO_MEM
+              #if defined(BLOCKID_INTO_MEM)
                 if (block < maxblock) block++;
-                else block = 0; 
-              #else      
+                else block = 0;
+              #endif
+              #if defined(BLOCK_EEPROM_PUT) 
                 if (block < 99) block++;
                 else block = 0; 
-              #endif 
+              #endif
+              #if defined(BLOCKID_NOMEM_SEARCH) 
+                block++;
+              #endif                 
               if(r=ReadDword(bytesRead)==4) {  // Data size to read
                 bytesToRead = outLong - 12;
               }
@@ -1058,11 +1072,12 @@ void TZXProcess() {
           //Pure Tap file block
           switch(currentBlockTask) {
             case READPARAM:
-              #ifdef BLOCKID_INTO_MEM
+            #if defined(BLOCKTAP_IN)
+              #if defined(BLOCKID_INTO_MEM)
                 blockOffset[block%maxblock] = bytesRead;
                 blockID[block%maxblock] = currentID;
               #endif
-              #ifdef BLOCK_EEPROM_PUT
+              #if defined(BLOCK_EEPROM_PUT)
                 #if defined(__AVR__)
                   EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
                   EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
@@ -1071,62 +1086,60 @@ void TZXProcess() {
                   EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID); 
                 #endif                 
               #endif
-
-                #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
-                    #ifdef XY
-                      setXY(3,3);
-                      sendChar('F');sendChar('E');
-                      setXY(10,3);
-                  //    if (block == 0) sendChar('0');
-                  //    if (block == 10) sendChar('1');
-                      if ((block%10) == 0) sendChar(48+block/10);  
-                      setXY(11,3);
-                      sendChar(48+block%10);   
-                    #endif
-                    #if defined(XY2) && not defined(OLED1306_128_64)
-                      setXY(9,1);sendChar('F');sendChar('E');                      
-                      setXY(12,1);if ((block%10) == 0) sendChar(48+block/10);
-                      setXY(13,1);sendChar(48+block%10);
-                    #endif
-                    #if defined(XY2) && defined(OLED1306_128_64)
-                      #ifdef XY2force
-                        sendStrXY("FE",7,4);
-                        if ((block%10) == 0) {itoa(block/10,input,10);sendStrXY(input,14,4);}
-                        itoa(block%10,input,10);sendStrXY(input,15,4);                      
-                      #else
-                        setXY(7,4);sendChar('F');sendChar('E');                    
-                        setXY(14,4);if ((block%10) == 0) sendChar(48+block/10);
-                        setXY(15,4);sendChar(48+block%10);
-                      #endif
-                    #endif                 
+              #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
+                #ifdef XY
+                  setXY(3,3); sendChar('F');sendChar('E');
+                  setXY(10,3); if ((block%10) == 0) sendChar(48+block/10);  
+                  setXY(11,3); sendChar(48+block%10);   
+                #endif
+                #if defined(XY2) && not defined(OLED1306_128_64)
+                  setXY(9,1);sendChar('F');sendChar('E');                      
+                  setXY(12,1);if ((block%10) == 0) sendChar(48+(block/10)%10);
+                  setXY(13,1);sendChar(48+block%10);
+                #endif
+                #if defined(XY2) && defined(OLED1306_128_64)
+                  #ifdef XY2force
+                    sendStrXY("FE",7,4);
+                    if ((block%10) == 0) {itoa(block/10,input,10);sendStrXY(input,14,4);}
+                    itoa(block%10,input,10);sendStrXY(input,15,4);                      
+                  #else
+                    setXY(3,3); sendChar('F');sendChar('E');                    
+                    setXY(10,3); if ((block%10) == 0) sendChar(48+(block/10)%10);
+                    setXY(11,3); sendChar(48+block%10);
+                  #endif
+                #endif                 
               #endif     
-              #ifdef BLOCKID_INTO_MEM
+              #if defined(BLOCKID_INTO_MEM)
                 if (block < maxblock) block++;
                 else block = 0; 
               #endif
-              #ifdef BLOCK_EEPROM_PUT       
+              #if defined(BLOCK_EEPROM_PUT)
                 if (block < 99) block++;
                 else block = 0; 
-              #endif   
-              pauseLength = PAUSELENGTH;
-              if(r=ReadWord(bytesRead)==2) {
-                    bytesToRead = outWord+1;
+              #endif
+              #if defined(BLOCKID_NOMEM_SEARCH) 
+                block++;
+              #endif
+            #endif                 
+            pauseLength = PAUSELENGTH;
+            if(r=ReadWord(bytesRead)==2) {
+              bytesToRead = outWord+1;
               }
-              if(r=ReadByte(bytesRead)==1) {
-                if(outByte == 0) {
-                  pilotPulses = PILOTNUMBERL + 1;
-                } else {
-                  pilotPulses = PILOTNUMBERH + 1;
-                }
-                bytesRead += -1;
+            if(r=ReadByte(bytesRead)==1) {
+              if(outByte == 0) {
+                pilotPulses = PILOTNUMBERL + 1;
+              } else {
+                pilotPulses = PILOTNUMBERH + 1;
               }
-              pilotLength = PILOTLENGTH;
-              sync1Length = SYNCFIRST;
-              sync2Length = SYNCSECOND;
-              zeroPulse = ZEROPULSE;
-              onePulse = ONEPULSE;
-              currentBlockTask = PILOT;
-              usedBitsInLastByte=8;
+              bytesRead += -1;
+            }
+            pilotLength = PILOTLENGTH;
+            sync1Length = SYNCFIRST;
+            sync2Length = SYNCSECOND;
+            zeroPulse = ZEROPULSE;
+            onePulse = ONEPULSE;
+            currentBlockTask = PILOT;
+            usedBitsInLastByte=8;
             break;
 
             default:
@@ -1139,9 +1152,9 @@ void TZXProcess() {
           switch(currentBlockTask) {
             case READPARAM:
               //pauseLength = PAUSELENGTH*5;
-              pauseLength = PAUSELENGTH;
+//              pauseLength = PAUSELENGTH;
               currentChar=0;
-              currentBlockTask=PAUSE;
+//              currentBlockTask=PAUSE;
             break;
             
             case PAUSE:
@@ -1303,19 +1316,7 @@ void TZXProcess() {
                 break;
                 
             case PAUSE:
-                //currentPeriod = 100; // 100ms pause
-                //bitSet(currentPeriod, 15);
-                if(!count==0) {
-                  #if defined(__AVR__)
-                    currentPeriod = 32769;
-                  #elif defined(__arm__) && defined(__STM32F1__)
-                    currentPeriod = 50;
-                  #endif
-                  count += -1;
-                } else {
-                  count= 100;
-                  currentBlockTask=SYNC1;
-                }
+                FlushBuffer(100);
                 break;                
           }
           break;
@@ -1372,6 +1373,8 @@ void TZXProcess() {
           
           #if defined(__AVR__)
             currentPeriod = 10;
+            bitSet(currentPeriod, 15);
+            bitSet(currentPeriod, 13);            
           #elif defined(__arm__) && defined(__STM32F1__)
             currentPeriod = 50;
           #endif
@@ -1960,15 +1963,14 @@ void OricDataBlock() {
         //return;                               // exit
       }
     } else if(r==0) {                         // If we reached the EOF
-      EndOfFile=true;
-      temppause = 0;
+      //EndOfFile=true;
+      //temppause = 0;
       //forcePause0=1;
-      forcePause0=0;
+      //forcePause0=0;
       count =255;
-      currentID = IDPAUSE;
-      //currentBlockTask = GAP;
-      //currentTask = IDEOF;
-      
+      //currentID = IDPAUSE;
+      currentTask = GETID;
+      currentID=IDEOF;     
       return;
     }
 
@@ -2120,6 +2122,42 @@ void wave2() {
   byte pauseFlipBit = false;
   unsigned long newTime=1;
   intError = false;
+/*  
+      if (bitRead(workingPeriod, 14)== 0) {
+        pinState = !pinState;
+        if (pinState == LOW)     WRITE_LOW;    
+        else  WRITE_HIGH;
+      } else {
+        if (bitRead(workingPeriod, 13) == 0)     WRITE_LOW;    
+        else  {WRITE_HIGH; bitClear(workingPeriod,13);}     
+        bitClear(workingPeriod,14);         //Clear ID15 flag
+        workingPeriod = SampleLength;            
+      } 
+        newTime = workingPeriod;
+        pos += 2;
+        if(pos > buffsize)                  //Swap buffer pages if we've reached the end
+        {
+          pos = 0;
+          workingBuffer^=1;
+          morebuff = HIGH;                  //Request more data to fill inactive page
+        }
+        timer.setPeriod(newTime+4);
+*/ 
+/*
+        pinState = !pinState;
+        if (pinState == LOW)     WRITE_LOW;    
+        else  WRITE_HIGH;
+        newTime = workingPeriod;
+        pos += 2;
+        if(pos > buffsize)                  //Swap buffer pages if we've reached the end
+        {
+          pos = 0;
+          workingBuffer^=1;
+          morebuff = HIGH;                  //Request more data to fill inactive page
+        }
+        timer.setPeriod(newTime+4);
+*/        
+ 
   if(isStopped==0 && workingPeriod >= 1)
   {
       if bitRead(workingPeriod, 15)          
@@ -2133,7 +2171,14 @@ void wave2() {
         pauseFlipBit = true;
         wasPauseBlock = true;
       } else {
-        if (wasPauseBlock==true && isPauseBlock==false) wasPauseBlock=false;        
+        
+       // if(workingPeriod >= 1 && wasPauseBlock==false) {
+          //pinState = !pinState;
+       // } else if (wasPauseBlock==true && isPauseBlock==false) {
+       //   wasPauseBlock=false;
+       // }
+        
+            if (wasPauseBlock==true && isPauseBlock==false) wasPauseBlock=false;        
       }
       #ifdef DIRECT_RECORDING
       if (bitRead(workingPeriod, 14)== 0) {
@@ -2154,8 +2199,15 @@ void wave2() {
       if(pauseFlipBit==true) {
         newTime = 1500;                     //Set 1.5ms initial pause block
         pinState = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
-        wbuffer[pos][workingBuffer] = (workingPeriod - 1) /256;  //reduce pause by 1ms as we've already pause for 1.5ms
-        wbuffer[pos+1][workingBuffer] = (workingPeriod - 1) %256;  //reduce pause by 1ms as we've already pause for 1.5ms                 
+        workingPeriod = workingPeriod - 1; 
+        if (bitRead(workingPeriod, 13)) {
+          bitClear(workingPeriod,13);                       
+          pinState = LOW;          
+          newTime = workingPeriod;                             
+          workingPeriod = 0;           
+        }
+        wbuffer[pos][workingBuffer] = workingPeriod /256;  //reduce pause by 1ms as we've already pause for 1.5ms
+        wbuffer[pos+1][workingBuffer] = workingPeriod  %256;  //reduce pause by 1ms as we've already pause for 1.5ms                 
         pauseFlipBit=false;
       } else {
         if(isPauseBlock==true) {
@@ -2174,6 +2226,7 @@ void wave2() {
           morebuff = HIGH;                  //Request more data to fill inactive page
         } 
      }
+  //} else if(workingPeriod <= 1 && isStopped==0) {
   } else if (isStopped==0) {  
     newTime = 1000;                         //Just in case we have a 0 in the buffer
     //pos += 1;
@@ -2187,6 +2240,10 @@ void wave2() {
     newTime = 50000;                         //Just in case we have a 0 in the buffer    
     //newTime = 100000;                         //Just in case we have a 0 in the buffer
   }
+  //newTime += 12;
+  //fudgeTime = micros() - fudgeTime;         //Compensate for stupidly long ISR
+  //Timer1.setPeriod(newTime - fudgeTime);    //Finally set the next pulse length
+  
   #if defined(__AVR__)
     Timer1.setPeriod(newTime +4);    //Finally set the next pulse length
   #elif defined(__arm__) && defined(__STM32F1__)    
@@ -2194,6 +2251,7 @@ void wave2() {
     newTime += 2;
     //timer.setPeriod(newTime);    
     timer.setSTM32Period(newTime);
+    
   #endif
 }
 
@@ -2392,8 +2450,8 @@ void ReadTZXHeader() {
       TZXStop();
     }
   } else {
-    printtextF(PSTR("Error Reading File"),0);  
-    delay(300);      
+    //printtextF(PSTR("Error Reading File"),0);  
+    //delay(300);      
   }
   bytesRead = 10;
 }
@@ -2411,8 +2469,8 @@ void ReadAYHeader() {
       TZXStop();
     }
   } else {
-    printtextF(PSTR("Error Reading File"),0);
-    delay(300);    
+    //printtextF(PSTR("Error Reading File"),0);
+    //delay(300);    
   }
   bytesRead = 0;
 }
@@ -2430,8 +2488,50 @@ void ReadAYHeader() {
         TZXStop();
       }
     } else {
-      printtextF(PSTR("Error Reading File"),0);
+      //printtextF(PSTR("Error Reading File"),0);
     }
     bytesRead =12;
   }
 #endif
+void DelayedStop() {
+          //Handle end of file
+          if(!count==0) {
+          
+          #if defined(__AVR__)
+            //currentPeriod = 32769;
+            //currentPeriod = 10;
+            
+            currentPeriod = 10;
+            bitSet(currentPeriod, 15); 
+            //bitSet(currentPeriod, 12);
+            bitSet(currentPeriod, 13);
+            
+          #elif defined(__arm__) && defined(__STM32F1__)
+            currentPeriod = 50;
+          #endif
+                 
+            count += -1;
+          } else {
+            stopFile();
+            return;
+          }       
+}
+void FlushBuffer(long newcount) {
+    //currentPeriod = 100; // 100ms pause
+    //bitSet(currentPeriod, 15);
+    if(!count==0) {
+
+    #if defined(__AVR__)
+      currentPeriod = 32769;
+      //currentPeriod = 32768 + 4096 + 10;
+    #elif defined(__arm__) && defined(__STM32F1__)
+      currentPeriod = 50;
+    #endif
+
+      count += -1;
+    } else {
+      count= newcount;
+      currentBlockTask=SYNC1;
+      return;
+    }  
+}
