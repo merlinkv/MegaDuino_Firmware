@@ -4,7 +4,9 @@
 //
 // MegaDuino Firmware is an adaptation of the MaxDuino firmware by Rafael Molina but is specially designed for my MegaDuino & MegaDuino STM32 projects
 //
-//
+// Version 1.5 - September 11, 2021
+//    Some optimizations for Arcon, Oric, Dragon & Camputerx Lynx
+//    Corrected block counter for TSX files (MSX)
 // Version 1.4 - August 18, 2021
 //    Fixed some bugs on ID19 & ID21 Block Types
 // Version 1.3 - February 27, 2021
