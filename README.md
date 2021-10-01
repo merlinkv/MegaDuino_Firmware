@@ -10,12 +10,13 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 # ATTENTION
 
-* All files must be copied to a folder named -> **MegaDuino_1.5**
+* All files must be copied to a folder named -> **MegaDuino_1.6**
 
 # Versions
 
 * Version 1.6 - October 1, 2021
   - Some works done with block rewind & forwarding (still in progress)
+  - Working on 4B (TSX) block types (still in progress)
 * Version 1.5 - September 11, 2021
   - Some optimizations for Arcon, Oric, Dragon & Camputerx Lynx
   - Corrected block counter for TSX files (MSX)
