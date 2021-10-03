@@ -15,7 +15,7 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 # Versions
 
 * Version 1.6 - October 1, 2021
-  - Some works done with block rewind & forwarding (still in progress)
+  - Working to enhance more the block rewind & forwarding (still in progress)
   - Some works done on 4B block types
 * Version 1.5 - September 11, 2021
   - Some optimizations for Arcon, Oric, Dragon & Camputerx Lynx
