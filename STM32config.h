@@ -52,11 +52,11 @@ byte skip2A = 0;                        // Pause on for BLK:2A
 // Uncomment next options to select LCD screens. Remember to comment the OLED options
 // ==================================================================================
 
-//#define LCD_I2C_ADDR    0x27  // Set the i2c address of your 1602LCD or 2004A usually 0x27 but can be 3f, just test.
+#define LCD_I2C_ADDR    0x27  // Set the i2c address of your 1602LCD or 2004A usually 0x27 but can be 3f, just test.
 //#define LCD16               // Set if you are using a 1602 LCD screen
-//#define LCD20                 // Set if you are using a 2004A LCD screen
-//#define SHOW_STATUS_LCD
-//#define SHOW_BLOCKPOS_LCD
+#define LCD20                 // Set if you are using a 2004A LCD screen
+#define SHOW_STATUS_LCD
+#define SHOW_BLOCKPOS_LCD
 
 // ==================================================================================
 
@@ -64,12 +64,12 @@ byte skip2A = 0;                        // Pause on for BLK:2A
 // Uncomment next options to select OLED screens. Remember to comment the LCD options
 // ==================================================================================
 
-#define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
-#define OLED_ROTATE180
-#define OLED_address   0x3C         // 0x3C or 0x3D
-#define OLED1306                    // Set if you are using OLED 1306 display
-#define OLED1306_128_64             // 128x64 resolution with 8 rows
-#define OLED1106_1_3                // Use this line as well if you have a 1.3" OLED screen
+//#define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
+//#define OLED_ROTATE180
+//#define OLED_address   0x3C         // 0x3C or 0x3D
+//#define OLED1306                    // Set if you are using OLED 1306 display
+//#define OLED1306_128_64             // 128x64 resolution with 8 rows
+//#define OLED1106_1_3                // Use this line as well if you have a 1.3" OLED screen
 
 // ==================================================================================
 

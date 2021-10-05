@@ -4,9 +4,8 @@
 //
 // MegaDuino Firmware is an adaptation of the MaxDuino firmware by Rafael Molina but is specially designed for my MegaDuino & MegaDuino STM32 projects
 //
-// Version 1.6 - October 1, 2021
-//   Working to enhance more the block rewind & forwarding (still in progress)
-//   Some works done on 4B block types
+// Version 1.6 - October 5, 2021
+//   Some works done to enhance the block rewind & forwarding and on 4B block types
 // Version 1.5 - September 11, 2021
 //    Some optimizations for Arcon, Oric, Dragon & Camputerx Lynx
 //    Corrected block counter for TSX files (MSX)
@@ -29,14 +28,14 @@
 #ifdef TimerOne
   #include <TimerOne.h>
 #elif defined(__arm__) && defined(__STM32F1__)
-  HardwareTimer timer(2); // channer 2  
-  #include "itoa.h"  
+  #include "TimerCounter.h"
+  TimerCounter timer(2);
+  #include <itoa.h>  
   #define strncpy_P(a, b, n) strncpy((a), (b), (n))
-  #define memcmp_P(a, b, n) memcmp((a), (b), (n))  
+  #define memcmp_P(a, b, n) memcmp((a), (b), (n)) 
 #else
   #include "TimerCounter.h"
   TimerCounter Timer1;              // preinstatiate
-  
   unsigned short TimerCounter::pwmPeriod = 0;
   unsigned char TimerCounter::clockSelectBits = 0;
   void (*TimerCounter::isrCallback)() = NULL;
@@ -502,7 +501,6 @@ void loop(void) {
           lcd.print((char *)input);lcd.print('<');lcd.print(' ');
           lcd.print(oldMaxFileName);                  
         #endif
-        
         #if defined(LCD20) && !defined(SHOW_STATUS_LCD) && !defined(SHOW_DIRNAMES)
            char len=0;
            lcd.setCursor(0,0); 
@@ -577,39 +575,6 @@ void loop(void) {
         lcd.print(PlayBytes);        
        }
      #endif
-     
-     
-/*     #if defined(LCD16) && defined(SHOW_BLOCKPOS_LCD)
-       if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
-        lcd.setCursor(11,0);
-         if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
-        else lcd.print(F("%^OFF"));  
-        while(digitalRead(btnRoot)==LOW && start==1 && !lastbtn) {
-         lastbtn = 1;
-         checkLastButton();           
-        }
-        lcd.setCursor(11,0);
-        lcd.print(' ');
-        lcd.print(' ');
-        lcd.print(PlayBytes);        
-       }
-     #endif
-     #if defined(LCD20) && defined(SHOW_BLOCKPOS_LCD)
-       if(digitalRead(btnRoot)==LOW && start==1 && pauseOn==1 && !lastbtn) {                                          // show min-max block
-        lcd.setCursor(13,0);
-         if (TSXCONTROLzxpolarityUEFSWITCHPARITY == 1) lcd.print(F(" %^ON"));
-        else lcd.print(F("%^OFF"));  
-        while(digitalRead(btnRoot)==LOW && start==1 && !lastbtn) {
-         lastbtn = 1;
-         checkLastButton();           
-        }
-        lcd.setCursor(11,0);
-        lcd.print(' ');
-        lcd.print(' ');
-        lcd.print(PlayBytes);        
-       }
-     #endif
-*/
 #endif  
 
 if(digitalRead(btnRoot)==LOW && start==0
@@ -795,7 +760,7 @@ if(digitalRead(btnUp)==LOW && start==0   // up dir sequential search
       #else
         setXY(15,3);if (jblks==BM_BLKSJUMP) sendChar('^'); else sendChar('\'');  
       #endif
-    #endif      
+    #endif
     debounce(btnRoot);
   }
 #endif
