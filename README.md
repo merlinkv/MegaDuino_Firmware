@@ -10,10 +10,14 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 # ATTENTION
 
-* All files must be copied to a folder named -> **MegaDuino_1.6**
+* All files must be copied to a folder named -> **MegaDuino_1.7**
 
 # Versions
 
+* Version 1.7 - September 15, 2022
+  - Some optimizations for ZX81
+  - Some works done on block types ID11, ID12, ID19 & ID21
+  - Minor changes for OLED 128x64
 * Version 1.6 - October 5, 2021
   - Some works done to enhance the block rewind & forwarding and on 4B block types
 * Version 1.5 - September 11, 2021
