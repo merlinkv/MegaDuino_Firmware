@@ -38,17 +38,63 @@ void UniPlay(char *filename){
     #endif
   }
 
-#ifdef Use_CAS
+ #ifdef Use_CAS 
+  if (!casduino) {
+    currentBlockTask = READPARAM;               //First block task is to read in parameters
+    clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
+    isStopped=false;
+    count = 255;                                //End of file buffer flush 
+    EndOfFile=false;
+    passforZero=2;
+    passforOne=4;
+    //pinState=LOW;                               //Always Start on a LOW output for simplicity
+   // digitalWrite(outputPin, pinState);
+//    digitalWrite(outputPin, LOW);
+    WRITE_LOW;
+    #if defined(__AVR__)    
+      Timer1.initialize(1000);                //100ms pause prevents anything bad happening before we're ready
+      Timer1.attachInterrupt(wave2);
+    #elif defined(__arm__) && defined(__STM32F1__)
+      //timer.setCount(0);
+      timer.setPeriod(1000);
+      timer.attachInterrupt(2,wave2); // channel 2
+      timer.resume();      
+    #endif
+//    Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
+  }
   else {
     #if defined(__AVR__)
       Timer1.initialize(period);
       Timer1.attachInterrupt(wave);
-    #elif defined(__arm__) && defined(__STM32f1__)
-      timer.setCount(0);
+    #elif defined(__arm__) && defined(__STM32F1__)
+      //timer.setCount(0);
       timer.setPeriod(period);
-      timer.attachInterrupt(2,wave); // channel 2   
+      timer.attachInterrupt(2,wave); // channel 2
+      timer.resume();   
     #endif        
   }
+#else
+    currentBlockTask = READPARAM;               //First block task is to read in parameters
+    clearBuffer2();                               // chick sound with CASDUINO clearBuffer()
+    isStopped=false;
+    count = 255;                                //End of file buffer flush 
+    EndOfFile=false;
+    passforZero=2;
+    passforOne=4;
+    //pinState=LOW;                               //Always Start on a LOW output for simplicity
+   // digitalWrite(outputPin, pinState);
+//    digitalWrite(outputPin, LOW);
+    WRITE_LOW;
+    #if defined(__AVR__)    
+      Timer1.initialize(1000);                //100ms pause prevents anything bad happening before we're ready
+      Timer1.attachInterrupt(wave2);
+    #elif defined(__arm__) && defined(__STM32F1__)
+      //timer.setCount(0);
+      timer.setPeriod(1000);
+      timer.attachInterrupt(2,wave2); // channel 2
+      timer.resume();      
+    #endif
+//    Timer1.setPeriod(1000);                     //set 1ms wait at start of a file.
 #endif
 }
 
@@ -681,20 +727,21 @@ void TZXProcess() {
           //Process ID19 - Generalized data block
           switch (currentBlockTask) {
             case READPARAM:
-        #ifdef ID19REW      
-          #ifdef BLOCKID_INTO_MEM
-            blockOffset[block%maxblock] = bytesRead;
-            blockID[block%maxblock] = currentID;
-          #endif
-          #ifdef BLOCK_EEPROM_PUT
-            #if defined(__AVR__)
-              EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
-              EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
-            #elif defined(__arm__) && defined(__STM32F1__)
-              EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
-              EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
-            #endif                   
-          #endif
+        #ifdef BLOCKID19_IN      
+              #ifdef BLOCKID_INTO_MEM
+                    blockOffset[block%maxblock] = bytesRead;
+                    blockID[block%maxblock] = currentID;
+              #endif
+              #ifdef BLOCK_EEPROM_PUT
+                    #if defined(__AVR__)
+                      EEPROM.put(BLOCK_EEPROM_START+5*block, bytesRead);
+                      EEPROM.put(BLOCK_EEPROM_START+4+5*block, currentID);
+                    #elif defined(__arm__) && defined(__STM32F1__)
+                      EEPROM_put(BLOCK_EEPROM_START+5*block, bytesRead);
+                      EEPROM_put(BLOCK_EEPROM_START+4+5*block, currentID);
+                    #endif                   
+              #endif
+        //#ifdef BLOCKID19_IN 
           #if defined(OLED1306) && defined(OLEDPRINTBLOCK)
             #ifdef XY
              setXY(3,3); sendChar('1');sendChar('9');
@@ -730,22 +777,26 @@ void TZXProcess() {
              block++;
            #endif                 
         #endif
-        if(r=ReadDword(bytesRead)==4) {
-          #ifdef ID19REW
-            bytesToRead = outLong;
-          #endif
-          }
-          if(r=ReadWord(bytesRead)==2) {
-            pauseLength = outWord;
-            #ifdef ID19REW
-            #endif              
-          }
-          bytesRead += 86 ;  // skip until DataStream filename
-          #ifdef ID19REW
-            bytesToRead += -88 ;    // pauseLength + SYMDEFs
-          #endif
-          currentBlockTask=PAUSE;
-          break;
+              if(r=ReadDword(bytesRead)==4) {
+                #ifdef BLOCKID19_IN
+                  bytesToRead = outLong;
+                #endif
+              }
+              if(r=ReadWord(bytesRead)==2) {
+                //Pause after this block in milliseconds
+                pauseLength = outWord;
+                #ifdef BLOCKID19_IN
+                  //bytesToRead += -2;
+                #endif              
+              }
+              bytesRead += 86 ;  // skip until DataStream filename
+              #ifdef BLOCKID19_IN
+                //bytesToRead += -86 ; // skip SYMDEF bytes inside block ID                       
+                bytesToRead += -88 ;    // pauseLength + SYMDEFs
+              #endif
+              //currentChar=0;
+              currentBlockTask=PAUSE;
+            break;
 
           case PAUSE:
             currentPeriod = PAUSELENGTH;
@@ -1667,7 +1718,7 @@ void ZX8081DataBlock() {
   if(currentBit==0) {                         //Check for byte end/first byte
     if(r=ReadByte(bytesRead)==1) {            //Read in a byte
       currentByte = outByte;
-    #ifdef ID19REW        
+    #ifdef BLOCKID19_IN        
         bytesToRead += -1;
         if((bytesToRead == -1) && (currentID == ID19)) {    
           bytesRead += -1;                      //rewind a byte if we've reached the end
