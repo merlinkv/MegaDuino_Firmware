@@ -56,7 +56,7 @@ byte skip2A = 1;                        // Pause on for BLK:2A
 //#define LCD20                   // Set if you are using a 2004A LCD screen
 
 //=====================================================================================
-//  OLED 128x32 or 128x62 displays. Remember to uncomment LCD difinitions
+//  OLED 128x32 or 128x64 displays. Remember to uncomment LCD difinitions
 //=====================================================================================
 
 #define OLED_SETCONTRAS   0xcf    // Override default value inside Diplay.ino, bigger to increase output current per segment
