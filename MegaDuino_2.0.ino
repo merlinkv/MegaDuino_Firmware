@@ -116,9 +116,7 @@ void setup() {
     lcd.init();                     //Initialise LCD
     lcd.backlight();
     lcd.clear();
-    #if (SPLASH_SCREEN)
-      Banner();
-    #endif   
+    Banner();
   #endif
   #ifdef OLED1306 
     #if defined(Use_SoftI2CMaster) 
@@ -151,7 +149,7 @@ void setup() {
   changeDirRoot();
   UniSetup();                       //Setup TZX specific options
   SDCardOK();
-  delay(1200);
+  delay(1600);
   #if defined(LCD16) || defined(LCD20)
     lcd.clear();
   #endif
@@ -1619,14 +1617,14 @@ void Banner() {
   #endif
   #ifdef LCD16
     lcd.setCursor(1,0); lcd.print(F(VERSION));
-    delay(2000);
+    delay(1800);
     lcd.clear();
   #endif  
   #ifdef LCD20
     lcd.setCursor(0,0); lcd.print("--------------------");
     lcd.setCursor(3,1); lcd.print(F(VERSION));
     lcd.setCursor(0,2); lcd.print("--------------------");
-    delay(2000);
+    delay(1800);
     lcd.clear();
   #endif
 }
