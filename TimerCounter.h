@@ -1,12 +1,3 @@
-/*
- *  Interrupt and PWM utilities for 16 bit Timer1 on ATmega168/328
- *  Original code by Jesse Tane for http://labs.ideo.com August 2008
- */
-#define TIMER1_A_PIN   9
-#define TIMER1_B_PIN   10
-#define TIMER1_ICP_PIN 8
-#define TIMER1_CLK_PIN 5
-
 #define TIMER1_RESOLUTION 65536UL  // Timer1 is 16 bit
 
 // Placing nearly all the code in this .h file allows the functions to be
@@ -66,7 +57,7 @@
        this->refresh();
     }
   };
-#elif defined ( __AVR_ATmega2560__)
+#elif defined( __AVR_ATmega2560__)
   class TimerCounter
   {
   public:
