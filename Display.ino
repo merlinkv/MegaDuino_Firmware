@@ -6,10 +6,18 @@
     // Used to send commands to the display.
     static void sendcommand(unsigned char com)
     {
-    Wire.beginTransmission(OLED_address); //begin transmitting
-    Wire.write(0x80); //command mode
-    Wire.write(com);
-    Wire.endTransmission(); // stop transmitting
+    #if defined(Use_SoftI2CMaster)       
+      i2c_start((OLED_address<<1)|I2C_WRITE);
+      i2c_write(0x80);
+      i2c_write(com); 
+      i2c_stop();
+    #else            
+      Wire.beginTransmission(OLED_address); //begin transmitting
+      Wire.write(0x80); //command mode
+      Wire.write(com);
+      Wire.endTransmission(); // stop transmitting
+    #endif
+
     }
     //==========================================================//
     // Actually this sends a byte, not a char to draw in the display.
@@ -17,10 +25,17 @@
     // for the big number font.
     static void SendByte(unsigned char data)
     {
-    Wire.beginTransmission(OLED_address); // begin transmitting
-    Wire.write(0x40);//data mode
-    Wire.write(data);
-    Wire.endTransmission(); // stop transmitting
+    #if defined(Use_SoftI2CMaster)       
+      i2c_start((OLED_address<<1)|I2C_WRITE); 
+      i2c_write(0x40); 
+      i2c_write(data); 
+      i2c_stop();
+    #else                   
+      Wire.beginTransmission(OLED_address); // begin transmitting
+      Wire.write(0x40);//data mode
+      Wire.write(data);
+      Wire.endTransmission(); // stop transmitting
+    #endif
     }
     //==========================================================//
     // Prints a display char (not just a byte)
@@ -28,10 +43,17 @@
     // and 8 ROWS (0-7).
     static void sendChar(unsigned char data)
     {
-    Wire.beginTransmission(OLED_address); // begin transmitting
-    Wire.write(0x40);//data mode
-    for(int i=0;i<8;i++)  Wire.write(pgm_read_byte(myFont[data-0x20]+i));
-    Wire.endTransmission(); // stop transmitting
+    #if defined(Use_SoftI2CMaster)       
+      i2c_start((OLED_address<<1)|I2C_WRITE);
+      i2c_write(0x40);
+      for(int i=0;i<8;i++)  i2c_write(pgm_read_byte(myFont[data-0x20]+i));
+      i2c_stop();
+    #else                   
+      Wire.beginTransmission(OLED_address); // begin transmitting
+      Wire.write(0x40);//data mode
+      for(int i=0;i<8;i++)  Wire.write(pgm_read_byte(myFont[data-0x20]+i));
+      Wire.endTransmission(); // stop transmitting
+    #endif
     } 
     /*
     //==========================================================//
@@ -51,19 +73,54 @@
     // Set the cursor position in a 16 COL * 2 ROW map.
     static void setXY(unsigned char col,unsigned char row)
     {
-    sendcommand(0xb0+row); //set page address
-    
+      #if defined(Use_SoftI2CMaster)       
+        i2c_start((OLED_address<<1)|I2C_WRITE);
+        i2c_write(0x80);  
+        i2c_write(0xb0+(row)); //set page address (row)
+        i2c_write(0x80); //command mode
+        #ifdef OLED1106_1_3            
+          i2c_write(0x02+(8*col&0x0f)); //set low col address
+        #else
+          i2c_write(0x00+(8*col&0x0f)); //set low col address
+        #endif
+        i2c_write(0x80); 
+        i2c_write(0x10+((8*col>>4)&0x0f)); //set high col address 
+        i2c_stop();         
+      #else                              
+        Wire.beginTransmission(OLED_address); //begin transmitting
+        Wire.write(0x80); //command mode
+        Wire.write(0xb0+(row)); //set page address (row)
+        Wire.write(0x80); //command mode
+        #ifdef OLED1106_1_3            
+          Wire.write(0x02+(8*col&0x0f)); //set low col address
+        #else
+          Wire.write(0x00+(8*col&0x0f)); //set low col address
+        #endif
+        Wire.write(0x80); //command mode   
+        Wire.write(0x10+((8*col>>4)&0x0f)); //set high col address   
+        Wire.endTransmission(); // stop transmitting                 
+      #endif
+         
+/*
+    sendcommand(0xb0+row); //set page address (row)    
     #ifdef OLED1106_1_3
       sendcommand(0x02+(8*col&0x0f)); //set low col address
     #else
       sendcommand(0x00+(8*col&0x0f)); //set low col address
-    #endif
-    
-    sendcommand(0x10+((8*col>>4)&0x0f)); //set high col address
-    }
+    #endif    
+      sendcommand(0x10+((8*col>>4)&0x0f)); //set high col address
+*/
+
+    //sendcommand(0x21); // set column start and end address
+    //sendcommand(8*col);   // set column start address
+    //sendcommand(0x7f);  // set column end address
+    //sendcommand(0x22);  // set row start and end address
+    //sendcommand(row); // set row start address
+    //sendcommand(0x07);  // set row end address           
+    }   
     //==========================================================//
     // Prints a string regardless the cursor position.
-    static void sendStr(unsigned char *string)
+    static void sendStr(const char *string)
     {
     unsigned char i=0;
     while(*string)
@@ -78,7 +135,7 @@
     //==========================================================//
     // Prints a string in coordinates X Y, being multiples of 8.
     // This means we have 16 COLS (0-15) and 8 ROWS (0-7).
-    static void sendStrXY( char *string, int X, int Y)
+    static void sendStrXY(const char *string, int X, int Y)
     {
     #ifdef XY
     setXY(X,Y);
@@ -98,16 +155,32 @@
     #if defined(XY2) && not defined(DoubleFont)
     
     int Xh=X, Xl=X;
-    char *stringL=string, *stringH=string;
-    
-    setXY(Xl,Y);    
+    const char *stringL=string, *stringH=string;
+
+    #if defined(OLED1106_1_3)
+      setXY(Xl,Y);
+    #else
+      setXY(Xl,Y);   
+      //sendcommand(0x22); // set row start and end address
+      //sendcommand(Y);   // set row start address
+      //sendcommand(Y+1);  // set row end address         
+      //sendcommand(0x21); // set column start and end address
+      //sendcommand(8*X);   // set column start address
+      //sendcommand(8*(X+strlen(string))-1);  // set column end address
+    #endif 
     while(*stringL){
       //setXY(Xl,Y);
-      Wire.beginTransmission(OLED_address); // begin transmitting
-      Wire.write(0x40);//data mode
+      #if defined(Use_SoftI2CMaster)       
+        i2c_start((OLED_address<<1)|I2C_WRITE);
+        i2c_write(0x40);
+      #else                  
+        Wire.beginTransmission(OLED_address); // begin transmitting
+        Wire.setClock(I2CCLOCK);     
+        Wire.write(0x40);//data mode
+      #endif
       for(int i=0;i<8;i++){
-          unsigned int il=0;
-          unsigned int ril=(pgm_read_byte(myFont[*stringL-0x20]+i));
+          int il=0;
+          int ril=(pgm_read_byte(myFont[*stringL-0x20]+i));
           
           for(int ib=0;ib<4;ib++){
               if (bitRead (ril,ib)){
@@ -116,21 +189,41 @@
               }
           }
           //SendByte(il);
-          Wire.write(il);
+          #if defined(Use_SoftI2CMaster)           
+            i2c_write(il);
+          #else          
+            Wire.write(il);
+          #endif
       }
-      Wire.endTransmission(); // stop transmitting
+     #if defined(Use_SoftI2CMaster) 
+        i2c_stop();
+     #else       
+        Wire.endTransmission(); // stop transmitting
+     #endif   
+
       Xl++;    
       stringL++;
     }
     
-    setXY (Xh,Y+1);    
+    #if defined(OLED1106_1_3)
+      setXY (Xh,Y+1);
+    #else
+      setXY (Xh,Y+1);    
+    #endif       
     while(*stringH){      
-      //setXY (Xh,Y+1);      
-      Wire.beginTransmission(OLED_address); // begin transmitting
-      Wire.write(0x40);//data mode          
+      //setXY (Xh,Y+1);
+      #if defined(Use_SoftI2CMaster) 
+        i2c_start((OLED_address<<1)|I2C_WRITE);
+        i2c_write(0x40);           
+      #else
+        Wire.beginTransmission(OLED_address); // begin transmitting
+        Wire.setClock(I2CCLOCK);
+        Wire.write(0x40);//data mode        
+      #endif
+       
       for(int i=0;i<8;i++){
-         unsigned int ih=0;
-         unsigned int rih=(pgm_read_byte(myFont[*stringH-0x20]+i));
+         int ih=0;
+         int rih=(pgm_read_byte(myFont[*stringH-0x20]+i));
         
          for(int ic=4;ic<8;ic++){
             if (bitRead (rih,ic)) {
@@ -139,75 +232,96 @@
             }   
           }
           //SendByte(ih);
-          Wire.write(ih);          
+          #if defined(Use_SoftI2CMaster)           
+            i2c_write(ih);
+          #else            
+            Wire.write(ih);
+          #endif
       }
-      Wire.endTransmission(); // stop transmitting      
+      #if defined(Use_SoftI2CMaster)       
+        i2c_stop();
+      #else      
+        Wire.endTransmission(); // stop transmitting
+      #endif
+      
       Xh++;    
       stringH++;
     }
-    
- /*   while(*string){
-
-      setXY(X,Y);    
-      for(int i=0;i<8;i++){
-          unsigned int il=0;
-          unsigned int ril=(pgm_read_byte(myFont[*string-0x20]+i));
-          
-          for(int ib=0;ib<4;ib++){
-              if (bitRead (ril,ib)){
-                  il |= (1 << ib*2);
-                  il |= (1 << (ib*2)+1);
-              }
-          }
-          SendByte(il);
-      }
-      
-      setXY (X,Y+1);
-      for(int i=0;i<8;i++){
-         unsigned int ih=0;
-         unsigned int rih=(pgm_read_byte(myFont[*string-0x20]+i));
-        
-         for(int ic=4;ic<8;ic++){
-            if (bitRead (rih,ic)) {
-                ih |= (1 << (ic-4)*2);
-                ih |= (1 << ((ic-4)*2)+1);
-            }   
-          }
-          SendByte(ih);
-      }
-      X++;    
-     string++;
-    } */
     #endif
 
     #if defined(XY2) && defined(DoubleFont)
     int Xh=X, Xl=X;
     char *stringL=string, *stringH=string;
     
-    setXY(Xl,Y);    
+    #if defined(OLED1106_1_3)
+      setXY(Xl,Y);
+    #else
+      setXY(Xl,Y);       
+      //sendcommand(0x22); // set row start and end address
+      //sendcommand(Y);   // set row start address
+      //sendcommand(Y+1);  // set row end address         
+      //sendcommand(0x21); // set column start and end address
+      //sendcommand(8*X);   // set column start address
+      //sendcommand(8*(X+strlen(string))-1);  // set column end address
+    #endif  
     while(*stringL){
       //setXY(Xl,Y);
-      Wire.beginTransmission(OLED_address); // begin transmitting
-      Wire.write(0x40);//data mode
+      #if defined(Use_SoftI2CMaster)       
+        i2c_start((OLED_address<<1)|I2C_WRITE);
+        i2c_write(0x40); 
+      #else            
+        Wire.beginTransmission(OLED_address); // begin transmitting
+        Wire.setClock(I2CCLOCK);
+        Wire.write(0x40);//data mode
+      #endif
+      
       for(int i=0;i<8;i++){
-          unsigned int ril=(pgm_read_byte(myFont[*stringL-0x20]+i));
-          Wire.write(ril);
+          int ril=(pgm_read_byte(myFont[*stringL-0x20]+i));
+          #if defined(Use_SoftI2CMaster)          
+            i2c_write(ril);
+          #else          
+            Wire.write(ril);
+          #endif 
       }
-      Wire.endTransmission(); // stop transmitting
+      #if defined(Use_SoftI2CMaster)       
+        i2c_stop(); 
+      #else        
+        Wire.endTransmission(); // stop transmitting
+      #endif
+      
       Xl++;    
       stringL++;
     }
     
-    setXY (Xh,Y+1);    
+    #if defined(OLED1106_1_3)
+      setXY (Xh,Y+1);
+    #else
+      setXY (Xh,Y+1);    
+    #endif     
     while(*stringH){      
-      //setXY (Xh,Y+1);      
-      Wire.beginTransmission(OLED_address); // begin transmitting
-      Wire.write(0x40);//data mode          
+      //setXY (Xh,Y+1);
+      #if defined(Use_SoftI2CMaster)        
+        i2c_start((OLED_address<<1)|I2C_WRITE);
+        i2c_write(0x40); 
+      #else                 
+        Wire.beginTransmission(OLED_address); // begin transmitting
+        Wire.setClock(I2CCLOCK);
+        Wire.write(0x40);//data mode 
+      #endif    
       for(int i=0;i<8;i++){
-          unsigned int rih=(pgm_read_byte(myFont[*stringH-0x20]+i+8));
-          Wire.write(rih);          
+          int rih=(pgm_read_byte(myFont[*stringH-0x20]+i+8));
+          #if defined(Use_SoftI2CMaster)           
+            i2c_write(rih);
+          #else            
+            Wire.write(rih);
+          #endif         
       }
-      Wire.endTransmission(); // stop transmitting      
+      #if defined(Use_SoftI2CMaster)       
+        i2c_stop();
+      #else        
+        Wire.endTransmission(); // stop transmitting
+      #endif
+      
       Xh++;    
       stringH++;
     }
@@ -220,9 +334,13 @@
 static void reset_display(void)
 {
   displayOff();
-  clear_display();
-
-  
+  clear_display();  
+  #if defined(video64text32)     // back to 128x32
+    sendcommand(0xA8);            //SSD1306_SETMULTIPLEX     
+    sendcommand(0x1f);            //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x64 OLED 0x03f     
+    sendcommand(0xDA);           //0xDA
+    sendcommand(0x02);           //COMSCANDEC /* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */      
+  #endif
   displayOn();
 }
 
@@ -246,7 +364,7 @@ void displayOff(void)
 static void clear_display(void)
 {
   unsigned char i,k;
-  #ifdef OLED1306_128_64
+  #if defined(OLED1306_128_64) || defined(video64text32)
     for(k=0;k<8;k++)  // 8 LINES
   #else
     for(k=0;k<4;k++) // 4 LINES  
@@ -265,7 +383,8 @@ static void clear_display(void)
     
 //==========================================================//
 // Inits oled and draws logo at startup
-static void init_OLED(void) {
+static void init_OLED(void)
+{
   /*
   sequence := { direct_value | escape_sequence }
   direct_value := 0..254
@@ -343,7 +462,7 @@ static void init_OLED(void) {
           sendcommand(0x27);                    // default 0x80 : (SMALL 0x00, LARGE 0xFF)
         #else
           sendcommand(0x81);                    //SETCONTRAS
-          sendcommand(0x80);                    //
+          sendcommand(0x47);                    // default 0x80 : (SMALL 0x00, LARGE 0xFF)
         #endif
     #endif
     
@@ -353,8 +472,15 @@ static void init_OLED(void) {
    // sendcommand(0x40);
    // sendcommand(0x2E);            // stop scroll
    // sendcommand(0xA4);        //DISPLAYALLON_RESUME        
-   // sendcommand(0xA6);        //NORMALDISPLAY             
-    sendcommand(0xAF);    //display on
+   // sendcommand(0xA6);        //NORMALDISPLAY
+   #if defined(XY2) 
+      sendcommand(0x20);            //Set Memory Addressing Mode
+      sendcommand(0x00);            //Set Memory Addressing Mode ab Horizontal addressing mode
+   #else
+      sendcommand(0x20);            //Set Memory Addressing Mode
+      sendcommand(0x02);            //Set Memory Addressing Mode ab Page addressing mode      
+   #endif              
+    //sendcommand(0xAF);    //display on
 
 /*    sendcommand(0xFF); // U8G_ESC_CS(0) disable chip
     sendcommand(0xd0 | ((0)&0x0f));
@@ -373,7 +499,7 @@ static void init_OLED(void) {
   //sendcommand(0x00);            //Set Memory Addressing Mode ab Horizontal addressing mode
     //sendcommand(0x02);         // Set Memory Addressing Mode ab Page addressing mode(RESET)  
   
-  clear_display();
+  //clear_display();
   
   #if defined(OLED1306_128_64) || defined(video64text32)
     for(int j=0;j<8;j++)
@@ -493,15 +619,9 @@ static void init_OLED(void) {
    
     }  
   }
-  #if defined(video64text32)     // back to 128x32
-    clear_display();  
-    sendcommand(0xAE);           //DISPLAYOFF
-    sendcommand(0xA8);            //SSD1306_SETMULTIPLEX     
-    sendcommand(0x1f);            //--1/48 duty, NEW!!! Feb 23, 2013: 128x32 OLED: 0x01f,  128x64 OLED 0x03f     
-    sendcommand(0xDA);           //0xDA
-    sendcommand(0x02);           //COMSCANDEC /* com pin HW config, sequential com pin config (bit 4), disable left/right remap (bit 5) */      
-    sendcommand(0xAF);          //display on
-  #endif  
+#if defined(LOAD_MEM_LOGO) || defined(LOAD_EEPROM_LOGO)
+  sendcommand(0xAF);    //display on
+#endif
 }
 
 #endif

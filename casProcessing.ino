@@ -1,4 +1,3 @@
-#ifdef Use_CAS
 void casPause()
 {
   noInterrupts();
@@ -12,14 +11,15 @@ void casStop()
     Timer1.stop();
   #elif defined(__arm__) && defined(__STM32F1__)
     timer.pause();
+  #else
+    #error unknown timer
   #endif
   //noInterrupts();
   isStopped=true;
   start=0;
   //interrupts();
   entry.close();
-  //REWIND=1;   
-  seekFile(currentFile);
+  seekFile();
   bytesRead=0;
   dragonMode=0;
   casduino=0;
@@ -27,10 +27,8 @@ void casStop()
   Timer1.attachInterrupt(wave2);
   Timer1.stop();     */                       //Stop the timer until we're ready   
 }
-#endif
 
 
-#ifdef Use_CAS
 void wave()
 {
   if(isStopped==0)
@@ -92,10 +90,8 @@ void wave()
       WRITE_LOW;
 
 }
-#endif
 
 
-#ifdef Use_CAS
 void writeByte(byte b)
 {
 #if defined(Use_CAS) && defined(Use_DRAGON)
@@ -144,10 +140,8 @@ void writeHeader()
     bits[i]=1;
   }
 }
-#endif
 
 
-#ifdef Use_CAS
 void process()
 {
   byte r=0;
@@ -276,8 +270,42 @@ void processDragon()
   lastByte=input[0];
   byte r=0;
   if((r=readfile(1,bytesRead))==1) {
+
+#if defined(Use_CAS) && defined(Use_DRAGON) && defined(Use_Dragon_sLeader) && not defined(Expand_All)
+    if(currentTask==lookHeader) {      
+      if(input[0] == 0x55) {
+       writeByte(0x55); 
+       bytesRead+=1;
+       count--;
+      } else {
+       currentTask=wHeader; 
+      }
+        
+    } else if(currentTask==wHeader) {      
+        if(count>=0) {
+          writeByte(0x55);
+          count--;
+        } else {    
+          if (fileStage > 0) currentTask=wData;
+          else {
+            count =19;
+            currentTask=wNameFileBlk;
+          }
+        }
+    } else if(currentTask==wNameFileBlk) {
+        if(!count==0) {
+            writeByte(input[0]);
+            bytesRead+=1;
+            count--;            
+        } else {            
+            fileStage=1;
+            currentTask=lookHeader;
+            count=255;
+        }
+    } else {        
+#endif
     
-#if defined(Use_CAS) && defined(Use_DRAGON) && defined(Use_Dragon_sLeader)
+#if defined(Use_CAS) && defined(Use_DRAGON) && defined(Use_Dragon_sLeader) && defined(Expand_All)
      
     if(currentTask==lookHeader) {      
       if(input[0] == 0x55) {
@@ -377,7 +405,6 @@ void processDragon()
 }
 #endif
 
-#endif 
 int readfile(byte bytes, unsigned long p)
 {
   
@@ -389,7 +416,7 @@ int readfile(byte bytes, unsigned long p)
   return i;
 }
 
-//#ifdef Use_CAS
+
 void clearBuffer()
 {
   for(int i=0;i<buffsize+1;i++)
@@ -398,10 +425,8 @@ void clearBuffer()
     wbuffer[i][1]=2;
   }
 }
-//#endif
 
 
-#ifdef Use_CAS
 void casduinoLoop()
 {
   noInterrupts();
@@ -457,4 +482,3 @@ void casduinoLoop()
          }
     } 
 }
-#endif

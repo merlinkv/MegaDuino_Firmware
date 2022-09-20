@@ -1,26 +1,27 @@
-////////////////                             CONFIG FOR STM32                                //////////////////////////////
+////////////////                        CONFIG FOR NEW ARDUINO MEGA2560                        ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                 Add // at the beginning of lines to comment and remove selected option                                */
 //**************************************  OPTIONAL USE TO SAVE SPACE  ***************************************************//
-#define Use_MENU                          // removing menu saves space
+#define Use_MENU                    // removing menu saves space
 #define AYPLAY
 #define MenuBLK2A
 #define ID11CDTspeedup
 #define DIRECT_RECORDING
 #define ZX81SPEEDUP
 #define tapORIC
-    #define ORICSPEEDUP
-#define Use_CAS                           // .cas files playback on MSX / Dragon / CoCo Tandy computers
-    #define Use_DRAGON
-        #define Use_Dragon_sLeader        // short Leader of 0x55 allowed for loading TOSEC files
-            #define Expand_All            // Expand short Leaders in ALL file header blocks.        
-#define Use_UEF                           // .uef files playback on BBC Micro / Electron / Atom computers
-    #define Use_c112                      // integer gap chunk for .uef
-    #define Use_hqUEF                     // .hq.uef files playback on BBC Micro / Electron / Atom computers
-        #define Use_c104                  // defined tape format data block: data bits per packet/parity/stop bits    
-        //#define Use_c114                // security cycles replaced with carrier tone
-        //#define Use_c116                // floating point gap chunk for .hq.uef
-        #define Use_c117                // data encoding format change for 300 bauds
+#define ORICSPEEDUP
+#define Use_CAS                     // .cas files playback on MSX / Dragon / CoCo Tandy computers
+#define Use_DRAGON
+#define Use_Dragon_sLeader          // short Leader of 0x55 allowed for loading TOSEC files
+#define Expand_All                  // Expand short Leaders in ALL file header blocks.         
+#define Use_UEF                     // .uef files playback on BBC Micro / Electron / Atom computers
+#define Use_c112                    // integer gap chunk for .uef
+#define Use_hqUEF                   // .hq.uef files playback on BBC Micro / Electron / Atom computers
+#define Use_c104                    // defined tape format data block: data bits per packet/parity/stop bits    
+//#define Use_c114                  // security cycles replaced with carrier tone
+//#define Use_c116                  // floating point gap chunk for .hq.uef
+#define Use_c117                    // data encoding format change for 300 bauds
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //         UEF file instructions: UEF files are compressed and can not be executed directly in MAXDUINO,                 //
 /*         for that you have to decompress these files manually.                                                         */
@@ -40,51 +41,59 @@ int period = 68;                        // 208 for BAUDRATE=1200
 byte mselectMask = 0;                   // Motor control state 1=on 0=off
 byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
                                         //            Mask // SpeedControl for .tsx // UEF Switch Parity
-byte skip2A = 0;                        // Pause on for BLK:2A
+byte skip2A = 1;                        // Pause on for BLK:2A
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                   Configure your screen settings here                                                  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Set defines for various types of screen
 
-//#define SERIALSCREEN              // For testing and debugging
+//=====================================================================================
+// LCD 16x2 or 20x4 displays. Remember to uncomment OLED definitions
+//=====================================================================================
 
-//#define LCD_I2C_ADDR    0x27        // Set the i2c address of your 1602LCD usually 0x27
-//#define LCD_I2C_ADDR    0x3f        // Set the i2c address of your 1602LCD usually 0x3f
-//#define LCD16             // Set if you are using a 1602 LCD screen
+//#define LCD_I2C_ADDR    0x27    // Set the i2c address of your 1602LCD usually 0x27
+//#define LCD16                 // Set if you are using a 1602 LCD screen
+//#define LCD20                   // Set if you are using a 2004A LCD screen
 
-//#define OLED_SETCONTRAS   0xcf      // Override default value inside Diplay.ino, bigger to increase output current per segment
+//=====================================================================================
+//  OLED 128x32 or 128x62 displays. Remember to uncomment LCD difinitions
+//=====================================================================================
+
+#define OLED_SETCONTRAS   0xcf    // Override default value inside Diplay.ino, bigger to increase output current per segment
 #define OLED_ROTATE180
-#define OLED_address   0x3C           //0x3C or 0x3D
-#define OLED1306                      // Set if you are using OLED 1306 display
-    #define OLED1306_128_64         // 128x64 resolution with 8 rows
-    //#define OLED1106_1_3            // Use this line as well if you have a 1.3" OLED screen
-    //#define video64text32    
-//#define P8544                       // Set if you are Display Nokia 5110 display
+#define OLED_address   0x3C       //0x3C or 0x3D
+#define OLED1306                  // Set if you are using OLED 1306 display
+#define OLED1306_128_64           // 128x64 resolution with 8 rows
+#define OLED1106_1_3              // Use this line as well if you have a 1.3" OLED screen
 
+//=====================================================================================
+
+//#define video64text32
 //#define btnRoot_AS_PIVOT
-  #define SHOW_DIRPOS
-      //#define SHOW_STATUS_LCD
-      //#define SHOW_DIRNAMES
+#define SHOW_DIRPOS
+//#define SHOW_STATUS_LCD
+//#define SHOW_DIRNAMES
       
-  #define SHOW_BLOCKPOS_LCD
+#define SHOW_BLOCKPOS_LCD
   
-//#define XY                         // use original settings for Oled line 0,1 and status for menu
-#define XY2                      // use double size font wihtout status line for menu
-#define XY2force                    // Use with care: delay interrupts and crash with other options, needs I2CFAST
-    //#define XY2shadedplay 
+#define XY                         // use original settings for Oled line 0,1 and status for menu
+//#define XY2                      // use double size font wihtout status line for menu
+//#define XY2force                    // Use with care: delay interrupts and crash with other options, needs I2CFAST
+//#define XY2shadedplay 
 #ifdef XY
-byte lineaxy=1;
+  byte lineaxy=1;
 #endif
 #ifdef XY2
-byte lineaxy=2;
+  byte lineaxy=2;
 #endif
 
 #define SHOW_CNTR
 #define SHOW_PCT
 #define CNTRBASE 100                // 100 for sss, 60 for m:ss (sorry, no space for separator)
 #define MAXPAUSE_PERIOD   8191         // millis
-//#define ONPAUSE_POLCHG              // 
-#define BLOCKMODE                   // REW or FF a block when in pause and Play to select it
+//#define MAXPAUSE_PERIOD   520         // millis  
+//#define ONPAUSE_POLCHG 
+#define BLOCKMODE                   // REW or FF a block when in pause and Play to select it 
 #define BLKSJUMPwithROOT            // use menu button in pause mode to switch blocks to jump
 #define BM_BLKSJUMP 20               // when menu pressed in pause mode, how may blocks to jump with REW OR FF
 #define BLKBIGSIZE                   // max number of block > 255
@@ -121,8 +130,13 @@ byte lineaxy=2;
 //#define LOAD_EEPROM_LOGO 
 
 #if defined(OLED1306_128_64) || defined(video64text32)
-  //#define EmptyLogo               // to erase
-  //#define Maxduino2Alf            // new Maxduino2 logo 128x64 by Alfredo Retrocant
+  //#define Cinta1                    // Cassette logo by MerlinKV
+  //#define MegaDuino1                // MegaDuino logo by MerlinKV
+  //#define MegaDuino2                // MaxDuino MEGA logo by MerlinKV
+  #define MegaDuino3                  // MegaDuino logo by MerlinKV
+  //#define MegaDuino4                // MegaDuino logo by MerlinKV   
+  //#define MegaDuino5                // MegaDuino logo by MerlinKV   
+  //#define Maxduino2Alf              // new Maxduino2 logo 128x64 by Alfredo Retrocant
   //#define CosmicCruiser             // Dragon32 CosmicCruiser by rcmolina
   //#define Batman
   //#define Superman
@@ -167,7 +181,6 @@ byte lineaxy=2;
   //#define LadyGaga
   //#define lionface
   //#define MichaelJackson
-  //#define CheGuevara
   //#define yinyang
   //#define OLEDmeter
   //#define fuelstation
@@ -176,18 +189,9 @@ byte lineaxy=2;
   //#define tanque4
   //#define tanque1
   //#define dostanques
-  #define cablemax
+  //#define cablemax
   //#define sony
-  //#define miniduino  
-#else
-//#define LOGOARDUITAPE            // original arduitape logo
-//#define LOGOMAXDUINO             // new logo created by Spirax
-#define LOGOMAXDUINO2              // new logo2 created by rcmolina
-//#define LOGOMAXDUINO3            // new logo3 created by rcmolina
-//#define LOGOMAXDUINO4            // new logo4 created by rcmolina
-//#define SUGARLESS_1              // new logo cretaed bt YoxxxoY
-//#define SUGARLESS_2              // new logo created by YoxxxoY
-//#define LOGOMINIDUINO            // new logo for A.Villena's Miniduino by rcmolina
+  //#define miniduino           
 #endif
 /////////////////////
 //      FONTS      //
@@ -195,43 +199,43 @@ byte lineaxy=2;
 //#define DoubleFont
 
 #ifdef DoubleFont
-//#define Retro8x16
-//#define Led8x16
-//#define rconsole8x16
-//#define symon8x16
-//#define uniscr8x16
-#define atariST8x16
+  #define Retro8x16
+   //#define Led8x16
+  //#define rconsole8x16
+  //#define symon8x16
+  //#define uniscr8x16
+  //#define atariST8x16
 #else
-//#define BasicFont
-//#define BoldFont
-//#define c64Font
-//#define zxFont
-//#define borderFont
-#define cartoonFont
-//#define CGAFont
-//#define ComputerFont
-//#define MilitaryFont
-//#define MSXFont
-//#define RoundFont
-//#define minimalFont
-//#define DigitalFont
-//#define TinyFont
-//#define BroadwayFont
-//#define VeniceFont
-//#define MagneticFont
-//#define CinemaFont
-//#define BubblegumFont
-//#define StarsFont
-//#define PreludeFont
-//#define EgyptianFont
-//#define LapseFont
-//#define TentacleFont
-//#define ChicagoFont
-//#define GenevaMonoFont
-//#define PAW17Font
-//#define AmstradCPCFont
-//#define SpectrumFont
-//#define SinclairOutlineFont
-//#define LittleShadowFont
-//#define ClairsysFont
+  #define BasicFont
+  //#define BoldFont
+  //#define c64Font
+  //#define zxFont
+  //#define borderFont
+  //#define cartoonFont
+  //#define CGAFont
+  //#define ComputerFont
+  //#define MilitaryFont
+  //#define MSXFont
+  //#define RoundFont
+  //#define minimalFont
+  //#define DigitalFont
+  //#define TinyFont
+  //#define BroadwayFont
+  //#define VeniceFont
+  //#define MagneticFont
+  //#define CinemaFont
+  //#define BubblegumFont
+  //#define StarsFont
+  //#define PreludeFont
+  //#define EgyptianFont
+  //#define LapseFont
+  //#define TentacleFont
+  //#define ChicagoFont
+  //#define GenevaMonoFont
+  //#define PAW17Font
+  //#define AmstradCPCFont
+  //#define SpectrumFont
+  //#define SinclairOutlineFont
+  //#define LittleShadowFont
+  //#define ClairsysFont
 #endif

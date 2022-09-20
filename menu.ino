@@ -1,3 +1,4 @@
+#include "buttons.h"
 
 #if defined(__arm__) && defined(__STM32F1__)
 
@@ -9,7 +10,7 @@
       return false;
   }
   
-  
+
   uint8_t EEPROM_put(uint16_t address, byte data) {
     if (EEPROM.init()==EEPROM_OK) {
       EEPROM.write(address, (uint16_t) data); 
@@ -17,7 +18,19 @@
     } else
       return false;
   }
+  #endif
+
+enum MenuItems{
+  BAUD_RATE,
+#ifndef NO_MOTOR
+  MOTOR_CTL,
 #endif
+  TSX_POL_UEFSW,
+#ifdef MenuBLK2A
+  BLK2A,
+#endif
+  _Num_Menu_Items
+};
 
  void menuMode()
  { 
@@ -25,169 +38,106 @@
   byte subItem=0;
   byte updateScreen=true;
   
-  while(digitalRead(btnStop)==HIGH || lastbtn)
+  while(!button_stop() || lastbtn)
   {
     if(updateScreen) {
-      #ifdef OLED1306
-        setXY(0,0); sendStr((unsigned char *)"Menu            ");
-        setXY(0,2); sendStr((unsigned char *)"----------------");
-        switch(menuItem) {
-        case 0:
-          setXY(0,1); sendStr((unsigned char *)"Baud Rate?      ");
+      printtextF(PSTR("Menu"),0);
+      switch(menuItem) {
+        case MenuItems::BAUD_RATE:
+        printtextF(PSTR("Baud Rate ?"),lineaxy);
         break;
-        case 1:
-          setXY(0,1); sendStr((unsigned char *)"Motor Ctrl?     ");
-        break;        
-        case 2:
-          setXY(0,1); sendStr((unsigned char *)"TSXCzxpUEF?     ");
+      #ifndef NO_MOTOR
+        case MenuItems::MOTOR_CTL:
+        printtextF(PSTR("Motor Ctrl ?"),lineaxy);
         break;
-        case 3:
-          setXY(0,1); sendStr((unsigned char *)"SkipBLK 2A?     ");
-        break;        
-        }
       #endif
-//        printtextF(PSTR("Menu"),0); - Ejemplo version original      
-      #ifdef LCD16
-        lcd.setCursor(0,1); lcd.print("                ");
-        switch(menuItem) {
-        case 0:
-          lcd.setCursor(0,0); lcd.print("Baud Rate?    ");
+        case MenuItems::TSX_POL_UEFSW:
+        printtextF(PSTR("TSXCzxpUEFSW ?"),lineaxy);
         break;
-        case 1:
-          lcd.setCursor(0,0); lcd.print("Motor Ctrl?   ");
-        break;        
-        case 2:
-          lcd.setCursor(0,0); lcd.print("TSXCzxpUEFSW? ");        
-        break;
-        case 3:
-          lcd.setCursor(0,0); lcd.print("Skip BLK:2A?  ");        
-        break;
-        }
-      #endif
-      #ifdef LCD20
-        lcd.setCursor(0,1); lcd.print("                    ");
-        switch(menuItem) {
-        case 0:
-          lcd.setCursor(0,0); lcd.print("Baud Rate?          ");
-        break;
-        case 1:
-          lcd.setCursor(0,0); lcd.print("Motor Ctrl?         ");
-        break;        
-        case 2:
-          lcd.setCursor(0,0); lcd.print("TSXCzxpUEFSW?       ");        
-        break;
-        case 3:
-          lcd.setCursor(0,0); lcd.print("Skip BLK:2A?        ");        
-        break;
-        }
-      #endif
-      updateScreen=false;
-      }
-    
-    if(digitalRead(btnDown)==LOW && !lastbtn){
       #ifdef MenuBLK2A
-        if(menuItem<3) menuItem+=1;
+        case MenuItems::BLK2A:
+        printtextF(PSTR("Skip BLK:2A ?"),lineaxy);
+        break;       
       #endif
-      #ifndef MenuBLK2A
-        if(menuItem<2) menuItem+=1;      
-      #endif
+             
+      }
+      updateScreen=false;
+    }
+    if(button_down() && !lastbtn){
+      if(menuItem<MenuItems::_Num_Menu_Items-1) menuItem+=1;
       lastbtn=true;
       updateScreen=true;
     }
-    if(digitalRead(btnUp)==LOW && !lastbtn) {
+    if(button_up() && !lastbtn) {
       if(menuItem>0) menuItem+=-1;
       lastbtn=true;
       updateScreen=true;
     }
-    if(digitalRead(btnPlay)==LOW && !lastbtn) {
+    if(button_play() && !lastbtn) {
       switch(menuItem){
-        case 0:
+        case MenuItems::BAUD_RATE:
           subItem=0;
           updateScreen=true;
           lastbtn=true;
-          while(digitalRead(btnStop)==HIGH || lastbtn) {
+          while(!button_stop() || lastbtn) {
             if(updateScreen) {
-//              printtextF(PSTR("Baud Rate"),0);
-              #ifdef OLED1306
-                setXY(0,2);
-                sendStr((unsigned char *)"----------------");
-                switch(subItem) {
-                case 0:
-                  setXY(0,1);
-                  sendStr((unsigned char *)"Baud Rate:  ");
-                  setXY(11,1);
-                  sendStr((unsigned char *)"1200 ");
+              printtextF(PSTR("Baud Rate"),0);
+              switch(subItem) {
+                case 0:                                  
+                  printtextF(PSTR("1200"),lineaxy);
                   if(BAUDRATE==1200) {
-                    setXY(11,1);
-                    sendStr((unsigned char *)"1200*");
+                    #ifndef OLED1306
+                      printtextF(PSTR("1200 *"),lineaxy);
+                    #else
+                      setXY(5,lineaxy);sendChar('*');
+                    #endif
                   }
                 break;
-                case 1:
-                  setXY(0,1);
-                  sendStr((unsigned char *)"Baud Rate:  ");
-                  setXY(11,1);
-                  sendStr((unsigned char *)"2400 ");
+                case 1:        
+                  printtextF(PSTR("2400"),lineaxy);
                   if(BAUDRATE==2400) {
-                    setXY(11,1);
-                    sendStr((unsigned char *)"2400*");
+                    #ifndef OLED1306
+                      printtextF(PSTR("2400 *"),lineaxy);
+                    #else
+                      setXY(5,lineaxy);sendChar('*');
+                    #endif
                   }
                 break;
-                case 2:
-                  setXY(0,1);
-                  sendStr((unsigned char *)"Baud Rate:  ");
-                  setXY(11,1);
-                  sendStr((unsigned char *)"3600 ");
+                case 2:                  
+                  printtextF(PSTR("3600"),lineaxy);
                   if(BAUDRATE==3600) {
-                    setXY(11,1);
-                    sendStr((unsigned char *)"3600*");
+                    #ifndef OLED1306
+                      printtextF(PSTR("3600 *"),lineaxy);
+                    #else
+                      setXY(5,lineaxy);sendChar('*');
+                    #endif
                   }
-                break;
-                case 3:
-                  setXY(0,1);
-                  sendStr((unsigned char *)"Baud Rate:  ");
-                  setXY(11,1);
-                  sendStr((unsigned char *)"3850 ");
+                break;                  
+                case 3:                  
+                  printtextF(PSTR("3850"),lineaxy);
                   if(BAUDRATE==3850) {
-                    setXY(11,1);
-                    sendStr((unsigned char *)"3850*");
+                    #ifndef OLED1306
+                      printtextF(PSTR("3850 *"),lineaxy);
+                    #else
+                      setXY(5,lineaxy);sendChar('*');
+                    #endif
                   }
-                break;
+                break;                
               }
-              #else
-                printtextF(PSTR("Baud Rate"),0);
-                switch(subItem) {
-                  case 0:                                  
-                    printtextF(PSTR("1200"),lineaxy);
-                    if(BAUDRATE==1200) printtextF(PSTR("1200 *"),lineaxy);
-                  break;
-                  case 1:        
-                    printtextF(PSTR("2400"),lineaxy);
-                    if(BAUDRATE==2400) printtextF(PSTR("2400 *"),lineaxy);
-                  break;
-                  case 2:                  
-                    printtextF(PSTR("3600"),lineaxy);
-                    if(BAUDRATE==3600) printtextF(PSTR("3600 *"),lineaxy);
-                  break;                  
-                  case 3:                  
-                    printtextF(PSTR("3850"),lineaxy);
-                    if(BAUDRATE==3850) printtextF(PSTR("3850 *"),lineaxy);
-                  break;                
-                }
-              #endif
               updateScreen=false;
             }
                     
-            if(digitalRead(btnDown)==LOW && !lastbtn){
+            if(button_down() && !lastbtn){
               if(subItem<3) subItem+=1;
               lastbtn=true;
               updateScreen=true;
             }
-            if(digitalRead(btnUp)==LOW && !lastbtn) {
+            if(button_up() && !lastbtn) {
               if(subItem>0) subItem+=-1;
               lastbtn=true;
               updateScreen=true;
             }
-            if(digitalRead(btnPlay)==LOW && !lastbtn) {
+            if(button_play() && !lastbtn) {
               switch(subItem) {
                 case 0:
                   BAUDRATE=1200;
@@ -203,10 +153,7 @@
                 break;
               }
               updateScreen=true;
-              #ifdef LCD20
-                LCDBStatusLine();
-              #endif
-              #ifdef OLED1306 
+              #if defined(OLED1306) && defined(OSTATUSLINE) 
                 OledStatusLine();
               #endif
               lastbtn=true;
@@ -217,161 +164,63 @@
           updateScreen=true;
         break;
 
-        case 1:
-          subItem=0;
-          updateScreen=true;
-          lastbtn=true;
-          while(digitalRead(btnStop)==HIGH || lastbtn) {
-            if(updateScreen) {
-              #ifdef OLED1306
-                setXY(0,1);
-                sendStr((unsigned char *)"Motor Ctrl:  ");
-              #else
-                printtextF(PSTR("Motor Ctrl"),0);
-              #endif
-              if(mselectMask==0) {
-                #ifdef OLED1306
-                  setXY(12,1);  
-                  sendStr((unsigned char *)"OFF*");
-                #else                
-                  printtextF(PSTR("OFF *"),lineaxy);
-                #endif
-              }
-              if(mselectMask==1) {
-                #ifdef OLED1306
-                  setXY(12,1);  
-                  sendStr((unsigned char *)"ON* ");
-                #else                
-                  printtextF(PSTR("ON *"),lineaxy);
-                #endif
-              }              
-              updateScreen=false;
-            }
-            if(digitalRead(btnPlay)==LOW && !lastbtn) {
-              mselectMask= !mselectMask;
-              lastbtn=true;
-              updateScreen=true;
-              #ifdef LCD20
-                LCDBStatusLine();
-              #endif              
-              #ifdef OLED1306 
-                OledStatusLine();
-              #endif              
-            }
-            checkLastButton();
-          }
+   #ifndef NO_MOTOR
+        case MenuItems::MOTOR_CTL:
+          doOnOffSubmenu(PSTR("Motor Ctrl"), mselectMask);
           lastbtn=true;
           updateScreen=true;
-        break;
+          break;
+   #endif
 
-        case 2:
-          subItem=0;
-          updateScreen=true;
-          lastbtn=true;
-          while(digitalRead(btnStop)==HIGH || lastbtn) {
-            if(updateScreen) {
-              #ifdef OLED1306
-                setXY(0,1);
-                sendStr((unsigned char *)"TSXCzxpSW:   ");
-              #else
-                printtextF(PSTR("TSXCzxpolUEFSW"),0);
-              #endif
-              if(TSXCONTROLzxpolarityUEFSWITCHPARITY==0) {
-                #ifdef OLED1306
-                  setXY(12,1);  
-                  sendStr((unsigned char *)"OFF*");
-                #else                
-                  printtextF(PSTR("OFF *"),lineaxy);
-                #endif
-              }
-              if(TSXCONTROLzxpolarityUEFSWITCHPARITY==1) {
-                #ifdef OLED1306
-                  setXY(12,1);  
-                  sendStr((unsigned char *)"ON* ");
-                #else                
-                  printtextF(PSTR("ON *"),lineaxy);
-                #endif
-              }              
-              updateScreen=false;
-            }
-            if(digitalRead(btnPlay)==LOW && !lastbtn) {
-              TSXCONTROLzxpolarityUEFSWITCHPARITY = !TSXCONTROLzxpolarityUEFSWITCHPARITY;
-              lastbtn=true;
-              updateScreen=true;
-              #ifdef LCD20
-                LCDBStatusLine();
-              #endif              
-              #ifdef OLED1306 
-                OledStatusLine();
-              #endif
-            }
-            checkLastButton();
-          }
+        case MenuItems::TSX_POL_UEFSW:
+          doOnOffSubmenu(PSTR("TSXCzxpolUEFSW"), TSXCONTROLzxpolarityUEFSWITCHPARITY);
           lastbtn=true;
           updateScreen=true;
-        break;
-   #ifdef MenuBLK2A        
-        case 3:
-          subItem=0;
-          updateScreen=true;
-          lastbtn=true;
-          while(digitalRead(btnStop)==HIGH || lastbtn) {
-            if(updateScreen) {
-              #ifdef OLED1306
-                setXY(0,1);
-                sendStr((unsigned char *)"SkipBLK 2A:  ");
-              #else
-                printtextF(PSTR("Skip BLK:2A"),0);
-              #endif
-              if(skip2A==0) {
-                #ifdef OLED1306
-                  setXY(12,1);  
-                  sendStr((unsigned char *)"OFF*");
-                #else                
-                  printtextF(PSTR("OFF *"),lineaxy);
-                #endif
-              }
-              if(skip2A==1) {
-                #ifdef OLED1306
-                  setXY(12,1);  
-                  sendStr((unsigned char *)"ON* ");
-                #else                
-                  printtextF(PSTR("ON *"),lineaxy);
-                #endif
-              }              
-              updateScreen=false;
-            }
-            if(digitalRead(btnPlay)==LOW && !lastbtn) {
-              skip2A = !skip2A;
-              lastbtn=true;
-              updateScreen=true;
-              #ifdef LCD20
-                LCDBStatusLine();
-              #endif              
-              #ifdef OLED1306 
-                OledStatusLine();
-              #endif
-            } 
-            checkLastButton();
-          }
+          break;
+          
+   #ifdef MenuBLK2A
+        case MenuItems::BLK2A:
+          doOnOffSubmenu(PSTR("Skip BLK:2A"), skip2A);
           lastbtn=true;
           updateScreen=true;
-        break;
-    #endif
+          break;
+   #endif     
       }
     }
     checkLastButton();
   }
+  #ifdef LOAD_EEPROM_SETTINGS
   updateEEPROM();
-  #ifdef OLED1306
-    setXY(0,2); sendStr((unsigned char *)"----------------");    
   #endif
-//  #ifdef LCD20
-//    LCDBStatusLine();  
-//  #endif   
-  debounce(btnStop);
+
+  debounce(button_stop);
  }
 
+void doOnOffSubmenu(const char * title, byte& refVar)
+{
+  bool updateScreen=true;
+  lastbtn=true;
+  while(!button_stop() || lastbtn) {
+    if(updateScreen) {
+      printtextF(title,0);
+      if(refVar==0) printtextF(PSTR("off *"),lineaxy);
+      else  printtextF(PSTR("ON *"),lineaxy);
+      updateScreen=false;
+    }
+    
+    if(button_play() && !lastbtn) {
+      refVar = !refVar;
+      lastbtn=true;
+      updateScreen=true;
+      #if defined(OLED1306) && defined(OSTATUSLINE) 
+        OledStatusLine();
+      #endif              
+    }
+    checkLastButton();
+  }
+}
+
+#ifdef LOAD_EEPROM_SETTINGS
  void updateEEPROM()
  {
   /* Setting Byte: 
@@ -401,10 +250,14 @@
     break;
   }
 
+  #ifndef NO_MOTOR
   if(mselectMask) settings |=128;
+  #endif
+
   if(TSXCONTROLzxpolarityUEFSWITCHPARITY) settings |=64;
+  
   #ifdef MenuBLK2A
-    if(skip2A) settings |=32;
+  if(skip2A) settings |=32;
   #endif
 
   #if defined(__AVR__)
@@ -423,26 +276,31 @@
   #elif defined(__arm__) && defined(__STM32F1__)
     EEPROM_get(EEPROM_CONFIG_BYTEPOS,&settings);
   #endif
+      
   if(!settings) return;
-
-
+  
+  #ifndef NO_MOTOR
   if(bitRead(settings,7)) {
     mselectMask=1;
   } else {
     mselectMask=0;
   }
+  #endif
+
   if(bitRead(settings,6)) {
     TSXCONTROLzxpolarityUEFSWITCHPARITY=1;
   } else {
     TSXCONTROLzxpolarityUEFSWITCHPARITY=0;
   }
+  
   #ifdef MenuBLK2A
-    if(bitRead(settings,5)) {
-      skip2A=1;
-    } else {
-      skip2A=0;
-    }   
+  if(bitRead(settings,5)) {
+    skip2A=1;
+  } else {
+    skip2A=0;
+  }   
   #endif
+  
   if(bitRead(settings,0)) {
     BAUDRATE=1200;
   }
@@ -455,14 +313,12 @@
   if(bitRead(settings,3)) {
     BAUDRATE=3850;  
   }
-//  setBaud();
-  UniSetup();
- 
  }
+#endif
 
 void checkLastButton()
 {
-  if(digitalRead(btnDown) && digitalRead(btnUp) && digitalRead(btnPlay) && digitalRead(btnStop)) lastbtn=false; 
+  if(!button_down() && !button_up() && !button_play() && !button_stop()) lastbtn=false; 
         //    setXY(0,0);
         //  sendChar(lastbtn+'0');
   delay(50);

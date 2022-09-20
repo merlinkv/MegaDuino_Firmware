@@ -1,20 +1,3 @@
-#ifdef __AVR_ATmega2560__
-  #define outputPin           23 
-  #define INIT_OUTPORT        DDRA |=  _BV(1)         // El pin23 es el bit1 del PORTA
-  #define WRITE_LOW           PORTA &= ~_BV(1)         // El pin23 es el bit1 del PORTA
-  #define WRITE_HIGH          PORTA |=  _BV(1)         // El pin23 es el bit1 del PORTA
-#elif defined(__arm__) && defined(__STM32F1__)
-  #define outputPin           PA9    // this pin is 5V tolerant and PWM output capable
-  #define INIT_OUTPORT            pinMode(outputPin,OUTPUT)
-  //#define INIT_OUTPORT            pinMode(outputPin,OUTPUT); GPIOA->regs->CRH |=  0x00000030  
-  #define WRITE_LOW               digitalWrite(outputPin,LOW)
-  //#define WRITE_LOW               GPIOA->regs->ODR &= ~0b0000001000000000
-  //#define WRITE_LOW               gpio_write_bit(GPIOA, 9, LOW)
-  #define WRITE_HIGH              digitalWrite(outputPin,HIGH)
-  //#define WRITE_HIGH              GPIOA->regs->ODR |=  0b0000001000000000
-  //#define WRITE_HIGH              gpio_write_bit(GPIOA, 9, HIGH)
-#endif 
-
 #define SHORT_SILENCE       122
 #define LONG_SILENCE        SHORT_SILENCE*2
 
@@ -23,9 +6,9 @@
 
 //#define buffsize            219
 //#define dragonBuff          4
-#define buffsize            208  // Impar para CoCo
-#define dragonBuff          1     // Ajuste para que wbuffer sea divisible entre 8: (208+1-1)/8
-
+/* Buffer overflow detected by David Hooper, tzx buffer must be with even positions */
+#define buffsize            175  // Impar para CoCo
+#define dragonBuff          0     // Ajuste para que wbuffer sea divisible entre 8: (175+1-0)/8
 
 /* Header Definitions */
 PROGMEM const byte HEADER[8] = { 0x1F, 0xA6, 0xDE, 0xBA, 0xCC, 0x13, 0x7D, 0x74 };
@@ -149,7 +132,7 @@ word currentPeriod=1;
 #define NAME                  7
 #define GAP                   8
 #define SYNCLAST              9
-#define NAMELAST              10
+#define NAME00                10
 
 
 //Spectrum Standards
@@ -189,6 +172,9 @@ byte blkchksum = 0;
 byte EndOfFile=false;
 word ayblklen = 0;
 byte casduino = 0;
+#ifdef ID11CDTspeedup
+byte AMScdt = 0;
+#endif
 
 volatile byte pinState=LOW;
 volatile byte isPauseBlock = false;
@@ -233,7 +219,12 @@ unsigned long loopStart=0;
 volatile byte currentChar=0;
 volatile byte currentByte=0;
 
-byte block = 0;
+#ifdef BLKBIGSIZE
+  word block = 0;
+#else
+  byte block = 0;
+#endif
+
 byte jblks = 1;
 byte oldMinBlock = 0;
 #ifdef BLOCK_EEPROM_PUT
@@ -316,3 +307,5 @@ byte UEFPASS = 0;
 #define ORICTURBOONEPULSE      60
 //#define ORICTURBOONELOWPULSE   208
 //#define ORICTURBOONEHIGHPULSE  208
+
+
