@@ -18,7 +18,7 @@ Thanks to the sixth button included in the MegaDuino project (board & components
   - Some bugs fixed when playing Amstrad CPC, Oric, ZX81 & MSX files
   - Some works done on block types ID11, ID12, ID19 & ID21  
   - Better performance on I2C LCD & I2C OLED displays
-  - Loading speed improved on Spectrum TZX turbo files, reaching speeds up to 4.500 bds
+  - Loading speed improved on Spectrum TZX turbo files, reaching speeds up to 4.500 bds with standard ROMs
   - Possibility to select different 8x8 fonts to use with OLED screens
 * Version 1.6 - October 5, 2021
   - Some works done to enhance the block rewind & forwarding and on 4B block types
