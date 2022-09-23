@@ -42,11 +42,11 @@ byte mselectMask = 0;                   // Motor control state 1=on 0=off
 byte TSXCONTROLzxpolarityUEFSWITCHPARITY = 0;  // Multiple flag: rpolarity needed for zx games: Basil the Great Mouse Detective, 
                                         //            Mask // SpeedControl for .tsx // UEF Switch Parity
 byte skip2A = 1;                        // Pause on for BLK:2A
+//
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*                                   Configure your screen settings here                                                  */
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Set defines for various types of screen
-
+//
 //=====================================================================================
 // LCD 16x2 or 20x4 displays. Remember to uncomment OLED definitions
 //=====================================================================================
