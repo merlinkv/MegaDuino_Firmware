@@ -6,6 +6,6 @@ Arduino_libraries.zip
 
 Arduino_User_Libraries.zip
 
-- - They have to be unzipped in the user documents directory, ie: ..\My Documents\Arduino\libraries
+- They have to be unzipped in the user documents directory, ie: ..\My Documents\Arduino\libraries
 
 
