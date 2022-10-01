@@ -2,8 +2,10 @@
 
 Arduino_libraries.zip
 
-- Must be decompressed on Adruino install directory
+- They have to be unzipped in the installation directory, ie: C:\Arduino\libraries
 
 Arduino_User_Libraries.zip
+
+- - They have to be unzipped in the user documents directory, ie: ..\My Documents\Arduino\libraries
 
 
