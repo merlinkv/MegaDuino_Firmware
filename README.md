@@ -15,8 +15,11 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 # Versions
 
-* Version 2.0
-  - Readme under reconstruction ...
+* Version 2.0 - September 20, 2022
+  - Some bugs fixed when playing Amstrad CPC, Oric, ZX81 & MSX files
+  - Better performance on I2C LCD & I2C OLED displays
+  - Loading speed improved on Spectrum TZX turbo files, reaching speeds up to 4.500 bds
+  - Possibility to select different 8x8 fonts to use with OLED screens
 * Version 1.6 - October 1, 2021
   - Some works done with block rewind & forwarding (still in progress)
 * Version 1.5 - September 11, 2021
