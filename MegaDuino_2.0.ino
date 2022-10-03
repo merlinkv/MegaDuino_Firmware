@@ -1631,11 +1631,11 @@ void Banner() {
 
 void NoSDCard() {
   #ifdef OLED1306
-    setXY(0,0); sendStr((unsigned char *)"----------------");
-    setXY(0,1); sendStr((unsigned char *)"   No SD Card   ");
-    setXY(0,2); sendStr((unsigned char *)"----------------");
-    setXY(0,3); sendStr((unsigned char *)"   Insert  SD   ");
-    setXY(0,4); sendStr((unsigned char *)"----------------");        
+    setXY(0,1); sendStr((unsigned char *)"----------------");
+    setXY(0,2); sendStr((unsigned char *)"   No SD Card   ");
+    setXY(0,3); sendStr((unsigned char *)"----------------");
+    setXY(0,4); sendStr((unsigned char *)"   Insert  SD   ");
+    setXY(0,5); sendStr((unsigned char *)"----------------");        
   #endif
   #ifdef LCD16
     lcd.setCursor(0,0); lcd.print("   No SD Card   ");

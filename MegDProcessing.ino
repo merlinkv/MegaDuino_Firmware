@@ -2497,7 +2497,7 @@ void ReadTZXHeader() {
     i = entry.read(tzxHeader,10);
     if(memcmp_P(tzxHeader,TZXTape,7)!=0) {
       printtextF(PSTR("NOT RECOGNISED"),0);
-      delay(300);     
+      delay(1200);     
       TZXStop();
     }
   } else {
