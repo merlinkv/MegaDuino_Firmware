@@ -16,7 +16,7 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 # Versions
 
 * Version 2.0
-  - Readme unbder reconstruction ...
+  - Readme under reconstruction ...
 * Version 1.6 - October 1, 2021
   - Some works done with block rewind & forwarding (still in progress)
 * Version 1.5 - September 11, 2021
