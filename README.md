@@ -11,10 +11,14 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 # ATTENTION
 
-* All files must be copied to a folder named -> **MegaDuino_2.0**
+* All files must be copied to a folder named -> **MegaDuino_2.5**
 
 # Versions
 
+* Version 2.5 - May 1, 2023
+   - Fixed some bugs on LCD & OLED displays
+   - Rework of all File Types & Block IDS
+   - Some works done on Menus
 * Version 2.0 - September 20, 2022
   - Some bugs fixed when playing Amstrad CPC, Oric, ZX81 & MSX files
   - Better performance on I2C LCD & I2C OLED displays
