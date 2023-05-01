@@ -17,7 +17,7 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 * Version 2.5 - May 1, 2023
    - Fixed some bugs on LCD & OLED displays
-   - Rework of all File Types & Block IDs
+   - Some works done on File Types & Block IDs
    - Some works done on Menus
 * Version 2.0 - September 20, 2022
   - Some bugs fixed when playing Amstrad CPC, Oric, ZX81 & MSX files
