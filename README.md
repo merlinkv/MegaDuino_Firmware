@@ -11,7 +11,7 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 # ATTENTION
 
-* All files must be copied to a folder named -> **MegaDuino_2.5**
+* All files must be copied to a folder named -> **MegaDuino_3.0**
 
 # Versions
 
