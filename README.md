@@ -7,7 +7,7 @@ Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and other
 
 **MegaDuino Firmware** have a different way of displaying information on OLED 128x64 1.3" (8 rows). Also you can use LCD 20x4 screens.
 
-Thanks to the sixth button included in the MegaDuino project (board & components are cased) there is the possibility of deleting files or doing a reset of the board (whithout opening the case).
+Thanks to the sixth button included in the MegaDuino project (board & components are cased) there is the possibility to do a reset of the board (whithout opening the case) or add extra functions (not implemented at the moment).
 
 # ATTENTION
 
