@@ -17,6 +17,7 @@ Thanks to the sixth button included in the MegaDuino project (board & components
 
 * Version 3.0 - February 8, 2025
    - Based on the latest OTLA version from rcmolina (https://github.com/rcmolina/MaxDuino/tree/master)
+   - Added a new Block ID for Jupiter ACE native TAP's
 * Version 2.5 - May 1, 2023
    - Fixed some bugs on LCD & OLED displays
    - Some works done on File Types & Block IDs
