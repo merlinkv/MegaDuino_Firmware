@@ -5,7 +5,7 @@ Original firmware writen by Andrew Beer, Duncan Edwards, Rafael Molina and other
 
 - Is an adaptation of the MaxDuino firmware by Rafael Molina and is specially designed for my MegaDuino PCB projects (Mega2560 & dual Mega2560/STM32).
 - Have a different way of displaying information on OLED 128x64 1.3" (8 rows). Also you can use LCD 20x4 screens.
-- Has been tested on next computers: ZX Spectrum, Amstrad CPC, MSX, Oric Atmos, Arcon Electronics, Dragon, Camputer Lynx, ZX81 & Jupiter ACE.
+- Has been tested on next computers & clonez: ZX Spectrum, Harlequin clones, N-Go, Amstrad CPC, MSX, Omega MSX2, Oric Atmos, Arcon Electronics, Dragon, Camputer Lynx, ZX81 & Jupiter ACE, etc.
 
 Thanks to the sixth button included in the MegaDuino project (board & components are cased) there is the possibility to do a reset of the board (whithout opening the case) or add extra functions (not implemented at the moment).
 
